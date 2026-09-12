@@ -1,19 +1,51 @@
-name: Local build validation
-on: workflow_dispatch
+name: Validate and build CCA
+on:
+  workflow_dispatch:
 permissions:
   contents: read
 jobs:
-  build:
+  test:
     strategy:
+      fail-fast: false
       matrix:
-        os: [macos-latest, windows-latest, ubuntu-latest]
+        os: [windows-latest, macos-latest, ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 22
-      - run: npx yarn@1.22.22 install --frozen-lockfile
-      - run: npx electron-builder --dir --publish never
+          node-version: 24
+      - name: Install locked dependencies
+        run: npx --yes yarn@1.22.22 install --frozen-lockfile --non-interactive
+      - run: npm test
+      - name: Desktop UI tests
+        if: runner.os != 'Linux'
+        run: npm run test:ui
+      - name: Desktop UI tests on Linux
+        if: runner.os == 'Linux'
+        run: xvfb-run --auto-servernum npm run test:ui
+      - name: Build unpacked app
+        run: npm run build -- --dir
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: 'false'
+      - name: Packaged application tests on Windows
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: |
+          $env:CCA_TEST_EXECUTABLE = (Resolve-Path 'dist/win-unpacked/CCA.exe').Path
+          npm run test:ui
+      - name: Packaged application tests on macOS
+        if: runner.os == 'macOS'
+        run: CCA_TEST_EXECUTABLE="$PWD/dist/mac-arm64/CCA.app/Contents/MacOS/CCA" npm run test:ui
+      - name: Windows ZIP
+        if: runner.os == 'Windows'
+        run: npm run build:windows
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: cca-validation-${{ matrix.os }}
+          path: |
+            artifacts/
+            test-results/
+            dist/*.zip
+          retention-days: 7

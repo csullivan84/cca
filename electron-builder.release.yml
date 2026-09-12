@@ -1,0 +1,7 @@
+# Deliberately fails without a trusted OS signing identity/certificate.
+extends: ./electron-builder.yml
+forceCodeSigning: true
+win:
+  signExecutable: true
+mac:
+  notarize: true

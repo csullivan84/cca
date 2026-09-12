@@ -1,38 +1,371 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' blob: data:; font-src 'none'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'">
-<title>CCA — Colour Contrast Analyser</title>
-<link rel="stylesheet" href="style.css">
-<script defer src="app.bundle.js"></script>
-</head>
-<body>
-<a href="#main" class="skip">Skip to colour analysis</a>
-<header class="app-header"><div><span class="brand">CCA</span><h1>Colour Contrast Analyser</h1></div><nav aria-label="Application"><button id="settings-open">Preferences &amp; shortcuts</button><button id="about-open">About</button></nav></header>
-<main id="main">
-<div class="toolbar" role="group" aria-label="Colour actions"><button id="read-result">Read result</button><button id="swap">Swap colours</button><button id="undo" disabled>Undo colour</button><button id="redo" disabled>Redo colour</button><button id="copy">Copy report</button><button id="copy-short">Copy short</button></div>
-<div class="pair-grid">
-<section class="colour-panel" aria-labelledby="foreground-title"><div class="swatch" id="foreground-swatch" aria-hidden="true"></div><div class="colour-body"><h2 id="foreground-title">Foreground colour</h2><label for="foreground">Colour value</label><input id="foreground" type="text" spellcheck="false" autocomplete="off" aria-describedby="foreground-error colour-help" value="#000000"><p class="error" id="foreground-error"></p><div class="colour-tools"><label>Format<select id="foreground-format"><option value="hex">HEX / HEX alpha</option><option value="rgb">RGB</option><option value="hsl">HSL</option><option value="hsv">HSV</option></select></label><button id="foreground-pick">Pick foreground</button></div><details id="foreground-sliders"><summary>Foreground sliders</summary><div id="foreground-channels"></div></details></div></section>
-<section class="colour-panel" aria-labelledby="background-title"><div class="swatch" id="background-swatch" aria-hidden="true"></div><div class="colour-body"><h2 id="background-title">Background colour</h2><label for="background">Colour value</label><input id="background" type="text" spellcheck="false" autocomplete="off" aria-describedby="background-error colour-help" value="#ffffff"><p class="error" id="background-error"></p><div class="colour-tools"><label>Format<select id="background-format"><option value="hex">HEX / HEX alpha</option><option value="rgb">RGB</option><option value="hsl">HSL</option><option value="hsv">HSV</option></select></label><button id="background-pick">Pick background</button></div><details id="background-sliders"><summary>Background sliders</summary><div id="background-channels"></div></details></div></section>
-</div>
-<p id="colour-help" class="hint">CSS names, HEX, RGB, HSL, HSV, Lab, OKLCH and display-p3. Analysis is in sRGB; out-of-gamut colours are clipped with a warning.</p>
-<p id="gamut-warning" class="warning" hidden></p>
-<section class="result" aria-labelledby="result-title"><div class="ratio-block"><h2 id="result-title">WCAG 2.2 contrast</h2><p id="ratio" class="ratio">21:1</p><p id="precision" class="hint"></p></div><ul id="criteria" class="criteria"></ul></section>
-<p id="compositing" class="hint"></p>
-<details class="panel" id="criteria-help"><summary>What these results mean</summary><p>These results assess colour contrast, not complete WCAG conformance. Large text is at least 18 pt (24 CSS px), or 14 pt (18.67 CSS px) when bold. Text exceptions include logos, incidental text and inactive controls. Non-text results apply to required identifying visuals, not every pixel.</p><div class="toolbar"><button data-help="minimum">1.4.3 Minimum contrast</button><button data-help="enhanced">1.4.6 Enhanced contrast</button><button data-help="nonText">1.4.11 Non-text contrast</button></div></details>
-<section class="panel" aria-labelledby="preview-title"><h2 id="preview-title">Sample preview</h2><div class="toolbar"><label>Font size (CSS px)<input id="font-size" type="number" min="8" max="96" value="18"></label><label>Weight<select id="font-weight"><option value="400">Regular (400)</option><option value="700">Bold (700)</option></select></label></div><p id="sample" class="sample">Example text showing contrast</p><p id="large-text" class="hint"></p></section>
-<details class="panel" id="suggestions"><summary>Find a passing colour</summary><div class="toolbar"><label>Keep unchanged<select id="locked"><option value="background">Background</option><option value="foreground">Foreground</option></select></label><label>Target contrast<select id="target"><option value="4.5">4.5:1 — AA text</option><option value="3">3:1 — large text / non-text</option><option value="7">7:1 — AAA text</option></select></label><button id="suggest">Suggest colour</button><button id="apply-suggestion" disabled>Apply suggestion</button></div><p id="suggestion-result">Searches black/white blends for the smallest sampled OKLab change while preserving alpha. This is not a global nearest-colour guarantee.</p></details>
-<details class="panel" id="library"><summary>History &amp; favourites</summary><div class="toolbar"><label>Search pairs<input id="history-search" type="search"></label><button id="clear-history">Clear history</button></div><h3>Recent pairs</h3><ul id="history-list" class="library-list"></ul><form id="favorite-form"><h3>Save current pair</h3><div class="toolbar"><label>Name<input id="favorite-name" maxlength="100" required></label><label>Collection<input id="favorite-collection" maxlength="100" value="General"></label><button type="submit">Save favourite</button></div></form><h3>Favourites</h3><ul id="favorite-list" class="library-list"></ul></details>
-<details class="panel" id="batch"><summary>Batch palette &amp; reports</summary><label for="palette">2–32 colours, one per line, or a JSON array</label><textarea id="palette" rows="5" maxlength="16384" spellcheck="false">#000000
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'none'; script-src 'self'; style-src 'self'; style-src-attr 'unsafe-inline'; img-src 'self' blob: data:; font-src 'none'; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'; frame-src 'none'"
+    />
+    <title>CCA — Colour Contrast Analyser</title>
+    <link rel="stylesheet" href="style.css" />
+    <script defer src="app.bundle.js"></script>
+  </head>
+  <body>
+    <a href="#main" class="skip">Skip to colour analysis</a>
+    <header class="app-header">
+      <div>
+        <span class="brand">CCA</span>
+        <h1>Colour Contrast Analyser</h1>
+      </div>
+      <nav aria-label="Application">
+        <button id="settings-open">Preferences &amp; shortcuts</button
+        ><button id="about-open">About</button>
+      </nav>
+    </header>
+    <main id="main">
+      <div class="toolbar" role="group" aria-label="Colour actions">
+        <button id="read-result">Read result</button
+        ><button id="swap">Swap colours</button
+        ><button id="undo" disabled>Undo colour</button
+        ><button id="redo" disabled>Redo colour</button
+        ><button id="copy">Copy report</button
+        ><button id="copy-short">Copy short</button>
+      </div>
+      <div class="pair-grid">
+        <section class="colour-panel" aria-labelledby="foreground-title">
+          <div class="swatch" id="foreground-swatch" aria-hidden="true"></div>
+          <div class="colour-body">
+            <h2 id="foreground-title">Foreground colour</h2>
+            <label for="foreground">Colour value</label
+            ><input
+              id="foreground"
+              type="text"
+              spellcheck="false"
+              autocomplete="off"
+              aria-describedby="foreground-error colour-help"
+              value="#000000"
+            />
+            <p class="error" id="foreground-error"></p>
+            <div class="colour-tools">
+              <label
+                >Format<select id="foreground-format">
+                  <option value="hex">HEX / HEX alpha</option>
+                  <option value="rgb">RGB</option>
+                  <option value="hsl">HSL</option>
+                  <option value="hsv">HSV</option>
+                </select></label
+              ><button id="foreground-pick">Pick foreground</button>
+            </div>
+            <details id="foreground-sliders">
+              <summary>Foreground sliders</summary>
+              <div id="foreground-channels"></div>
+            </details>
+          </div>
+        </section>
+        <section class="colour-panel" aria-labelledby="background-title">
+          <div class="swatch" id="background-swatch" aria-hidden="true"></div>
+          <div class="colour-body">
+            <h2 id="background-title">Background colour</h2>
+            <label for="background">Colour value</label
+            ><input
+              id="background"
+              type="text"
+              spellcheck="false"
+              autocomplete="off"
+              aria-describedby="background-error colour-help"
+              value="#ffffff"
+            />
+            <p class="error" id="background-error"></p>
+            <div class="colour-tools">
+              <label
+                >Format<select id="background-format">
+                  <option value="hex">HEX / HEX alpha</option>
+                  <option value="rgb">RGB</option>
+                  <option value="hsl">HSL</option>
+                  <option value="hsv">HSV</option>
+                </select></label
+              ><button id="background-pick">Pick background</button>
+            </div>
+            <details id="background-sliders">
+              <summary>Background sliders</summary>
+              <div id="background-channels"></div>
+            </details>
+          </div>
+        </section>
+      </div>
+      <p id="colour-help" class="hint">
+        CSS names, HEX, RGB, HSL, HSV, Lab, OKLCH and display-p3. Analysis is in
+        sRGB; out-of-gamut colours are clipped with a warning.
+      </p>
+      <p id="gamut-warning" class="warning" hidden></p>
+      <section class="result" aria-labelledby="result-title">
+        <div class="ratio-block">
+          <h2 id="result-title">WCAG 2.2 contrast</h2>
+          <p id="ratio" class="ratio">21:1</p>
+          <p id="precision" class="hint"></p>
+        </div>
+        <ul id="criteria" class="criteria"></ul>
+      </section>
+      <p id="compositing" class="hint"></p>
+      <details class="panel" id="criteria-help">
+        <summary>What these results mean</summary>
+        <p>
+          These results assess colour contrast, not complete WCAG conformance.
+          Large text is at least 18 pt (24 CSS px), or 14 pt (18.67 CSS px) when
+          bold. Text exceptions include logos, incidental text and inactive
+          controls. Non-text results apply to required identifying visuals, not
+          every pixel.
+        </p>
+        <div class="toolbar">
+          <button data-help="minimum">1.4.3 Minimum contrast</button
+          ><button data-help="enhanced">1.4.6 Enhanced contrast</button
+          ><button data-help="nonText">1.4.11 Non-text contrast</button>
+        </div>
+      </details>
+      <section class="panel" aria-labelledby="preview-title">
+        <h2 id="preview-title">Sample preview</h2>
+        <div class="toolbar">
+          <label
+            >Font size (CSS px)<input
+              id="font-size"
+              type="number"
+              min="8"
+              max="96"
+              value="18" /></label
+          ><label
+            >Weight<select id="font-weight">
+              <option value="400">Regular (400)</option>
+              <option value="700">Bold (700)</option>
+            </select></label
+          >
+        </div>
+        <p id="sample" class="sample">Example text showing contrast</p>
+        <p id="large-text" class="hint"></p>
+      </section>
+      <details class="panel" id="suggestions">
+        <summary>Find a passing colour</summary>
+        <div class="toolbar">
+          <label
+            >Keep unchanged<select id="locked">
+              <option value="background">Background</option>
+              <option value="foreground">Foreground</option>
+            </select></label
+          ><label
+            >Target contrast<select id="target">
+              <option value="4.5">4.5:1 — AA text</option>
+              <option value="3">3:1 — large text / non-text</option>
+              <option value="7">7:1 — AAA text</option>
+            </select></label
+          ><button id="suggest">Suggest colour</button
+          ><button id="apply-suggestion" disabled>Apply suggestion</button>
+        </div>
+        <p id="suggestion-result">
+          Searches black/white blends for the smallest sampled OKLab change
+          while preserving alpha. This is not a global nearest-colour guarantee.
+        </p>
+      </details>
+      <details class="panel" id="library">
+        <summary>History &amp; favourites</summary>
+        <div class="toolbar">
+          <label>Search pairs<input id="history-search" type="search" /></label
+          ><button id="clear-history">Clear history</button>
+        </div>
+        <h3>Recent pairs</h3>
+        <ul id="history-list" class="library-list"></ul>
+        <form id="favorite-form">
+          <h3>Save current pair</h3>
+          <div class="toolbar">
+            <label
+              >Name<input id="favorite-name" maxlength="100" required /></label
+            ><label
+              >Collection<input
+                id="favorite-collection"
+                maxlength="100"
+                value="General" /></label
+            ><button type="submit">Save favourite</button>
+          </div>
+        </form>
+        <h3>Favourites</h3>
+        <ul id="favorite-list" class="library-list"></ul>
+      </details>
+      <details class="panel" id="batch">
+        <summary>Batch palette &amp; reports</summary>
+        <label for="palette">2–32 colours, one per line, or a JSON array</label
+        ><textarea id="palette" rows="5" maxlength="16384" spellcheck="false">
+#000000
 #ffffff
-#336699</textarea><div class="toolbar"><label>Import palette (.txt or .json)<input id="palette-file" type="file" accept=".txt,.json"></label><button id="analyze-palette">Analyze all combinations</button><label>Export format<select id="export-format"><option value="html">Accessible HTML</option><option value="txt">Plain text</option><option value="json">JSON</option><option value="csv">CSV (Excel compatible)</option></select></label><button id="export-current">Export current pair</button><button id="export-batch" disabled>Export palette results</button></div><p id="batch-summary"></p><ol id="batch-results" class="library-list"></ol></details>
-<details class="panel" id="screenshot"><summary>Screenshot pixel sampler</summary><p id="pixel-help">Import a PNG or JPEG. Focus the image, use arrow keys to move one pixel (Shift for ten), then Enter to apply. Or enter exact X/Y coordinates. Escape cancels and restores focus. Transparent pixels are composited on white. No screen-recording permission is needed.</p><label>Import screenshot<input id="screenshot-file" type="file" accept="image/png,image/jpeg"></label><div class="toolbar"><label>Apply to<select id="pixel-section"><option value="foreground">Foreground</option><option value="background">Background</option></select></label><label>X<input id="pixel-x" type="number" min="0" value="0" disabled></label><label>Y<input id="pixel-y" type="number" min="0" value="0" disabled></label><button id="apply-pixel" disabled>Apply pixel</button></div><p id="pixel-result">No screenshot loaded.</p><canvas id="pixel-canvas" tabindex="0" role="img" aria-label="Screenshot pixel sampler" aria-describedby="pixel-help pixel-result" hidden></canvas></details>
-<details class="panel" id="simulation"><summary>Colour-vision simulations</summary><p>These are approximate simulations, not a diagnosis or a separate WCAG compliance test. Individual perception varies. Always retain non-colour cues.</p><div id="simulations" class="simulation-grid"></div></details>
-<p class="footer">Independent CCA · Based on TPGi’s Colour Contrast Analyser · GPL-3.0-or-later · Offline by default</p>
-</main>
-<div class="status-bar"><p id="notice" role="status" aria-live="polite" aria-atomic="true">Ready.</p><p id="live-result" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></p></div>
-<dialog id="settings-dialog" aria-labelledby="settings-title"><form id="settings-form"><h2 id="settings-title">Preferences &amp; shortcuts</h2><p>Shortcuts work while CCA has focus. Use Alt plus a letter, or an available function key. Windows F11/F12 picker keys can be reassigned here.</p><div class="settings-grid"><label>Theme<select id="theme"><option value="system">System</option><option value="light">Light</option><option value="dark">Dark</option></select></label><label>Language<select id="language"></select></label><label>Ratio decimal places<input id="rounding" type="number" min="0" max="6"></label><label class="check"><input id="always-on-top" type="checkbox">Always on top</label></div><p class="hint">Original translations are retained for existing labels; new workbench text currently falls back to English.</p><fieldset id="shortcuts"><legend>Keyboard shortcuts</legend></fieldset><label>Full copy template<textarea id="regular-template" maxlength="4000" rows="4"></textarea></label><label>Short copy template<textarea id="short-template" maxlength="4000" rows="2"></textarea></label><p class="hint">Tokens: %f%, %b%, %ratio%, %aa%, %aaa%. Ratio is unrounded.</p><p class="error" id="settings-error" role="alert"></p><div class="toolbar"><button type="submit">Save preferences</button><button type="button" id="reset-shortcuts">Reset shortcuts</button><button type="button" data-close="settings-dialog">Cancel</button></div></form></dialog>
-<dialog id="about-dialog" aria-labelledby="about-title"><h2 id="about-title">About CCA</h2><p id="version"></p><p>This independently maintained application is based on The Paciello Group / TPGi’s Colour Contrast Analyser 3.5.5. Credit to Cédric Trévisan and all original contributors. This is not an official TPGi release.</p><p>Licensed under GNU GPL version 3 or later. Source code and license are included with this distribution. No warranty.</p><p id="portable-status"></p><div class="toolbar"><button data-help="upstream">Original project</button><button id="check-updates">Check private updates</button><button id="download-update" disabled>Save verified update</button></div><p id="update-status">Updates are opt-in and require a trusted signed release endpoint. No upstream checks.</p><button data-close="about-dialog">Close</button></dialog>
-</body></html>
+#336699</textarea>
+        <div class="toolbar">
+          <label
+            >Import palette (.txt or .json)<input
+              id="palette-file"
+              type="file"
+              accept=".txt,.json" /></label
+          ><button id="analyze-palette">Analyze all combinations</button
+          ><label
+            >Export format<select id="export-format">
+              <option value="html">Accessible HTML</option>
+              <option value="txt">Plain text</option>
+              <option value="json">JSON</option>
+              <option value="csv">CSV (Excel compatible)</option>
+            </select></label
+          ><button id="export-current">Export current pair</button
+          ><button id="export-batch" disabled>Export palette results</button>
+        </div>
+        <p id="batch-summary"></p>
+        <ol id="batch-results" class="library-list"></ol>
+      </details>
+      <details class="panel" id="screenshot">
+        <summary>Screenshot pixel sampler</summary>
+        <p id="pixel-help">
+          Import a PNG or JPEG. Focus the image, use arrow keys to move one
+          pixel (Shift for ten), then Enter to apply. Or enter exact X/Y
+          coordinates. Escape cancels and restores focus. Transparent pixels are
+          composited on white. No screen-recording permission is needed.
+        </p>
+        <label
+          >Import screenshot<input
+            id="screenshot-file"
+            type="file"
+            accept="image/png,image/jpeg"
+        /></label>
+        <div class="toolbar">
+          <label
+            >Apply to<select id="pixel-section">
+              <option value="foreground">Foreground</option>
+              <option value="background">Background</option>
+            </select></label
+          ><label
+            >X<input
+              id="pixel-x"
+              type="number"
+              min="0"
+              value="0"
+              disabled /></label
+          ><label
+            >Y<input
+              id="pixel-y"
+              type="number"
+              min="0"
+              value="0"
+              disabled /></label
+          ><button id="apply-pixel" disabled>Apply pixel</button>
+        </div>
+        <p id="pixel-result">No screenshot loaded.</p>
+        <canvas
+          id="pixel-canvas"
+          tabindex="0"
+          role="img"
+          aria-label="Screenshot pixel sampler"
+          aria-describedby="pixel-help pixel-result"
+          hidden
+        ></canvas>
+      </details>
+      <details class="panel" id="simulation">
+        <summary>Colour-vision simulations</summary>
+        <p>
+          These are approximate simulations, not a diagnosis or a separate WCAG
+          compliance test. Individual perception varies. Always retain
+          non-colour cues.
+        </p>
+        <div id="simulations" class="simulation-grid"></div>
+      </details>
+      <p class="footer">
+        Independent CCA · Based on TPGi’s Colour Contrast Analyser ·
+        GPL-3.0-or-later · Offline by default
+      </p>
+    </main>
+    <div class="status-bar">
+      <p id="notice" role="status" aria-live="polite" aria-atomic="true">
+        Ready.
+      </p>
+      <p
+        id="live-result"
+        class="sr-only"
+        role="status"
+        aria-live="polite"
+        aria-atomic="true"
+      ></p>
+    </div>
+    <dialog id="settings-dialog" aria-labelledby="settings-title">
+      <form id="settings-form">
+        <h2 id="settings-title">Preferences &amp; shortcuts</h2>
+        <p>
+          Shortcuts work while CCA has focus. Use Alt plus a letter, or an
+          available function key. Windows F11/F12 picker keys can be reassigned
+          here.
+        </p>
+        <div class="settings-grid">
+          <label
+            >Theme<select id="theme">
+              <option value="system">System</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+            </select></label
+          ><label>Language<select id="language"></select></label
+          ><label
+            >Ratio decimal places<input
+              id="rounding"
+              type="number"
+              min="0"
+              max="6" /></label
+          ><label class="check"
+            ><input id="always-on-top" type="checkbox" />Always on top</label
+          >
+        </div>
+        <p class="hint">
+          Original translations are retained for existing labels; new workbench
+          text currently falls back to English.
+        </p>
+        <fieldset id="shortcuts"><legend>Keyboard shortcuts</legend></fieldset>
+        <label
+          >Full copy template<textarea
+            id="regular-template"
+            maxlength="4000"
+            rows="4"
+          ></textarea></label
+        ><label
+          >Short copy template<textarea
+            id="short-template"
+            maxlength="4000"
+            rows="2"
+          ></textarea>
+        </label>
+        <p class="hint">
+          Tokens: %f%, %b%, %ratio%, %aa%, %aaa%. Ratio is unrounded.
+        </p>
+        <p class="error" id="settings-error" role="alert"></p>
+        <div class="toolbar">
+          <button type="submit">Save preferences</button
+          ><button type="button" id="reset-shortcuts">Reset shortcuts</button
+          ><button type="button" data-close="settings-dialog">Cancel</button>
+        </div>
+      </form>
+    </dialog>
+    <dialog id="about-dialog" aria-labelledby="about-title">
+      <h2 id="about-title">About CCA</h2>
+      <p id="version"></p>
+      <p>
+        This independently maintained application is based on The Paciello Group
+        / TPGi’s Colour Contrast Analyser 3.5.5. Credit to Cédric Trévisan and
+        all original contributors. This is not an official TPGi release.
+      </p>
+      <p>
+        Licensed under GNU GPL version 3 or later. Source code and license are
+        included with this distribution. No warranty.
+      </p>
+      <p id="portable-status"></p>
+      <div class="toolbar">
+        <button data-help="upstream">Original project</button
+        ><button id="check-updates">Check private updates</button
+        ><button id="download-update" disabled>Save verified update</button>
+      </div>
+      <p id="update-status">
+        Updates are opt-in and require a trusted signed release endpoint. No
+        upstream checks.
+      </p>
+      <button data-close="about-dialog">Close</button>
+    </dialog>
+  </body>
+</html>
