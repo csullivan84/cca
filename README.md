@@ -1,59 +1,88 @@
-# CCA — independent development repository
-![GPL-3.0 licence](https://img.shields.io/github/license/thepaciellogroup/ccae.svg)
+# CCA — independent Colour Contrast Analyser
 
-This is an independently initialized copy, not a GitHub fork, of
-[The Paciello Group / TPGi’s Colour Contrast Analyser](https://github.com/ThePacielloGroup/CCAe),
-starting from the supplied 3.5.5 source archive. Credit belongs to TPGi,
-Cédric Trévisan, and the original contributors. This copy is not an official TPGi release.
-The original GPL license and notices are retained in `LICENSE` and the source.
+An offline-first, keyboard-accessible colour contrast workbench for Windows,
+macOS and Linux. Electron 44.3.0; application version 4.0.0.
 
-## Local development
+## Windows: no developer tools required
 
-- Runtime: Electron 44.3.0 (macOS 13+; 64-bit platforms).
-- Install: `npx yarn@1.22.22 install --frozen-lockfile`
-- Run: `npm start`
-- Build locally without publishing: `npm run build`
-- Upstream update checks and release publishing are disabled in this independent copy.
-- Signing/notarization must be configured with the new maintainer’s credentials before distribution.
+Download/extract the entire `cca.zip`, then run `Start CCA.cmd` or
+`windows/CCA.exe`. Do not run the EXE from inside the ZIP or move it away from
+its DLLs and resources. Node.js, Git, GitHub login and administrator installation
+are not required. The included Windows build is x64 and unsigned.
 
-![CCA logo](build/96x96.png)
+A `portable.txt` marker beside the EXE keeps preferences, history and favourites
+in `windows/data/`. Remove the marker before launching to use the per-user
+application-data folder instead. If the portable folder is not writable, CCA
+falls back to per-user storage. Back up the data folder before replacing a build.
 
-The Colour Contrast Analyser (CCA) helps you determine the legibility of text and the contrast of visual elements, such as graphical controls and visual indicators.
+Two extra Windows conveniences:
+- Portable launch and a source-build `.cmd` script handle paths with spaces.
+- Optional per-user NSIS installation needs no elevation and preserves user data.
 
-This repository contains the source code for the new Colour Contrast Analyser (CCA) builds for Windows and macOS based on [Electron](https://electronjs.org/). For the previous, non-Electron versions ("CCA Classic"), see the [CCA-Win](https://github.com/ThePacielloGroup/CCA-Win) and [CCA-OSX](https://github.com/ThePacielloGroup/CCA-OSX) repositories.
+Windows x64 is the delivered binary target. Native Windows ARM64 is not included.
+The source also builds for macOS 13+ and Linux. See [release notes](docs/RELEASES.md).
 
-![CCA Interface](cca.png)
+## Workbench
 
-For further information, see [TPGi's Colour Contrast Analyser resource page](https://www.tpgi.com/color-contrast-checker/).
+- Exact WCAG 2.2 contrast decisions, with rounding only for display.
+- Modern CSS colour input, alpha compositing, RGB/HSL/HSV sliders and colour swapping.
+- Debounced screen-reader announcements, a read-result shortcut, keyboard navigation,
+  focus restoration, high-contrast support and zoom/reflow.
+- Undo/redo, recent history, named favourites and collections.
+- Passing-colour suggestions that preserve the locked colour and opacity.
+- Font-size/weight previews and eight colour-vision simulations.
+- Palette import/batch analysis and HTML, text, JSON or Excel-compatible CSV export.
+- Built-in screen picker and a keyboard-navigable screenshot pixel sampler.
+- Sandboxed renderer, validated IPC, restricted navigation and offline defaults.
 
-## Features
-- WCAG 2.1 compliance indicators
-- Several ways to set colours: raw text entry (accepts any valid CSS colour format), RGB sliders, colour picker (Windows and macOS only)
-- Support for alpha transparency on foreground colours
-- Colour blindness simulator
+Default shortcuts while CCA has focus:
+- Alt+R: read the full contrast result.
+- F11 / F12: pick foreground / background.
+- Alt+S: swap colours.
+- Alt+Z / Alt+Y: undo / redo a colour change.
+- Alt+C: copy the report.
+- F1: About. Ctrl+, (Command+, on Mac): preferences.
+- Escape: dismiss a dialog, picker or expanded section and restore focus.
 
-## Known issues
-- See the known issues for the latest [CCA release](https://github.com/ThePacielloGroup/CCAe/releases) and [confirmed bugs](https://github.com/ThePacielloGroup/CCAe/issues?q=is%3Aissue+is%3Aopen+label%3Abug)
+All workbench shortcuts can be changed in Preferences. Screen-picker keyboard
+behavior depends on Chromium/platform support; the screenshot sampler supports
+explicit X/Y coordinates, arrows, Shift+arrows, Enter and Escape on every platform.
 
-## Contributing
-If you have an idea for a new feature, or if you found a bug, please submit a GitHub issue. Please search the existing issues before submitting to
-prevent duplicates.
+Original translations remain available for existing labels; new workbench copy
+currently falls back to English. Simulations are approximations, not compliance
+guarantees. These results assess contrast, not full accessibility conformance.
 
-If you want to contribute, please send a pull request and someone will review your code. Please
-follow the [Contribution
-Guidelines](CONTRIBUTING.md)
-before sending your pull request.
+## Attribution and license
 
-## Contact
-If you have any questions, feel free to open an issue here on GitHub.  
+This repository was independently initialized from the supplied 3.5.5 source archive of
+[The Paciello Group / TPGi’s Colour Contrast Analyser](https://github.com/ThePacielloGroup/CCAe).
+Credit belongs to TPGi, Cédric Trévisan, and all original contributors. This is not
+an official TPGi release and is not a GitHub fork. Original icons, translations,
+license and historical change notes are retained.
 
-## License
-[![GNU GPLv3 Image](https://www.gnu.org/graphics/gplv3-127x51.png)](http://www.gnu.org/licenses/gpl-3.0.en.html)  
+GPL-3.0-or-later. See [LICENSE](LICENSE) and [third-party notices](THIRD_PARTY_NOTICES.md).
+Source accompanies the delivery ZIP. The software is supplied without warranty.
 
-Colour Contrast Analyser (CCA) is Free Software: You can use, study share and improve it at your
-will. Specifically you can redistribute and/or modify it under the terms of the
-[GNU General Public License](https://www.gnu.org/licenses/gpl.html) as
-published by the Free Software Foundation, either version 3 of the License, or
-(at your option) any later version.
+Private development repository: https://github.com/csullivan84/cca
 
-> This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+## Build and test
+
+Node.js 22+ and a desktop session are needed for source builds/UI tests, not for
+running the bundled Windows application.
+
+```sh
+npx --yes yarn@1.22.22 install --frozen-lockfile --non-interactive
+npm test
+npm run test:ui
+npm start
+npm run build:windows
+```
+
+- Windows source helper: `scripts/build-windows.cmd`.
+- `npm run build:windows:installer` creates the per-user installer.
+- CI is manually triggered to avoid unwanted build usage on every push.
+- Private updates are opt-in, signature-verified downloads; no credentials are embedded.
+- OS signing/notarization and a private update service require trusted external identities.
+
+See [implementation status](IMPROVEMENTS.md), [validation](docs/VALIDATION.md),
+and [release/security configuration](docs/RELEASES.md).

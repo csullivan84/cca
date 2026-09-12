@@ -1,6 +1,7 @@
 appId: com.csullivan84.cca
 productName: CCA
 asar: true
+afterPack: scripts/after-pack.cjs
 compression: normal
 directories:
   output: dist
@@ -41,6 +42,7 @@ nsis:
   createStartMenuShortcut: true
   artifactName: cca-setup-${version}-${arch}.${ext}
 linux:
+  executableName: cca
   icon: build/icon.png
   category: Utility
   target: [AppImage, deb]

@@ -1,64 +1,70 @@
-# Proposed next 32 improvements
+# Implementation status — CCA 4.0.0
 
-These are proposals, not implemented features. Electron 44.3.0 migration is separate.
-Based on inspection of the supplied 3.5.5 code; prioritize accessibility, correctness,
-and safe desktop boundaries before adding advanced analysis.
+The Electron 44.3.0 upgrade is separate from the 32 items below. Implementations
+are in the source and exercised by automated tests where stated. External
+certification/assistive-technology limits are stated explicitly rather than counted
+as completed validation.
 
-## Accessibility and everyday use
+1. Implemented: debounced, atomic live-region contrast announcements (650 ms).
+2. Implemented: Alt+R reads the pair, ratio, and all five pass/fail results.
+3. Automated accessibility/keyboard regression suite implemented and run, including
+   both dialogs, expanded panels, labels, focus, and reflow. Actual NVDA/VoiceOver
+   speech output has not been certified; automated axe checks are not equivalent.
+4. Implemented: dialog, picker and expanded-panel focus restoration and Escape handling.
+5. Implemented: visible, linked invalid-colour messages and aria-invalid.
+6. Implemented: resizable windows, responsive reflow, and zoom support.
+7. Implemented: forced-colour/system/light/dark styles, keyboard outlines and text statuses.
+8. Implemented: configurable shortcuts, canonicalization, reserved-key and conflict validation.
+9. Implemented: picker instructions, cancellation, failure feedback and screenshot fallback.
+10. Implemented: bounded undo/redo, including sliders, swaps, picked and loaded pairs.
+11. Implemented: searchable, persistent 100-pair history with explicit clear.
+12. Implemented: named favourites/collections (up to 200), search and deletion.
+13. Implemented: unrounded threshold decisions and regression vectors at 3, 4.5 and 7.
+    Fixed the upstream three-decimal pre-classification rounding defect.
+14. Implemented: foreground/background alpha compositing, effective-colour explanation,
+    white backdrop disclosure, and unit tests.
+15. Implemented: WCAG 2.2 criterion links, large-text thresholds and scope/exception wording.
+16. Implemented: passing-colour search preserving either locked colour and opacity.
+    Searches 2,050 black/white-blend candidates by OKLab distance; it is not a
+    mathematical global nearest-colour solver and says so in the UI.
+17. Implemented: font size/weight preview and large-text eligibility explanation.
+18. Implemented: bounded palette import (text/JSON) and all ordered pair combinations.
+19. Implemented: HTML, text, JSON and CSV exports; generated from validated colours.
+20. Implemented: Culori CSS Color 4 parsing, original HSV input, explicit sRGB clipping.
+21. Implemented: PNG/JPEG import, bounded decode, keyboard/click/coordinate pixel sampling.
+22. Implemented: eight simulations with approximation and non-conformance warnings.
+23. Implemented: Node-free sandboxed renderer, context isolation, narrow preload API.
+24. Implemented: sender/main-frame checks, fixed IPC methods and bounded validated payloads.
+25. Implemented: strict script CSP, local custom protocol, denied popups/navigation/permissions.
+    Dynamic colour styles alone permit inline style attributes; scripts never do.
+26. Fixed by replacing the broken this.store language callback with validated settings
+    and safe translation lookup; French language switching is regression tested.
+27. Implemented: shared accessible dialogs on all platforms; no Linux platform exclusion.
+28. Implemented: persisted bounds and on-display-change recovery in logical coordinates;
+    tests cover disconnected displays, negative origins and small work areas.
+29. Replaced opaque native helpers with Chromium EyeDropper plus shipped JavaScript
+    screenshot sampling. No 32-bit picker executable or unreproducible native helper
+    remains. Native screen-picker behavior still depends on OS/Chromium permissions.
+30. Implemented: unit, source UI, packaged-app, accessibility, security and CI tests.
+    Exact executed platforms/results are in docs/VALIDATION.md.
+31. Implemented: builder/dependency modernization, exact direct versions, fresh frozen
+    Yarn lockfile and audit. The checked lockfile had zero known audit findings.
+32. Implemented: fail-closed signed-release configuration and opt-in authenticated,
+    Ed25519-verified private update downloads with origin/size/hash/expiry checks.
+    No trusted OS signing certificates or update hosting were supplied: the delivered
+    build is unsigned; signed/notarized releases and a live update service are not deployed.
 
-1. Announce contrast changes through a debounced live region, without speech flooding.
-2. Add one keyboard command to read foreground, background, ratio, and pass/fail together.
-3. Run and document VoiceOver and NVDA regression checks for every dialog and picker.
-4. Restore focus to the invoking control after help, sliders, dialogs, and picker cancellation.
-5. Add inline invalid-colour errors with aria-invalid and linked error descriptions.
-6. Make windows resizable and layouts reflow at large text and zoom levels.
-7. Audit forced-colour/high-contrast support and visible keyboard focus across themes.
-8. Add user-configurable shortcuts with conflict detection and an accessible shortcut reference.
-9. Provide spoken picker instructions, Escape cancellation, and clear permission-denied feedback.
-10. Add undo/redo for colour changes, including swaps and slider adjustments.
-11. Keep a searchable recent-pair history with an explicit clear-history action.
-12. Save named favourite pairs and collections.
+## Extra Windows improvements
 
-## Analysis and reporting
+33. Portable runtime and launch script: no Node/Git/login/admin needed, paths with spaces
+    supported, optional adjacent data folder, safe per-user fallback and single-instance activation.
+34. Per-user installer configuration preserves data and disables elevation; source-build
+    command script and Excel-friendly BOM/CRLF CSV simplify Windows workflows.
 
-13. Add contrast regression vectors around 3:1, 4.5:1, and 7:1; never judge rounded ratios.
-14. Add alpha-compositing tests with explicit effective-colour explanations.
-15. Audit WCAG 2.2 wording and link each result to the relevant criterion and assumptions.
-16. Suggest the nearest passing colour while allowing either colour to remain locked.
-17. Preview font size and weight with clear large-text eligibility explanations.
-18. Import palettes and evaluate all foreground/background combinations.
-19. Export accessible HTML, plain text, JSON, and CSV reports.
-20. Accept modern CSS colour syntax with explicit out-of-gamut handling.
-21. Add screenshot import and keyboard-navigable pixel sampling.
-22. Explain colour-vision simulations as approximations rather than compliance guarantees.
+## Repository and licensing
 
-## Security and reliability
-
-23. Replace renderer Node access with narrow preload APIs and enable context isolation/sandboxing.
-24. Validate IPC senders and payloads; replace the arbitrary store-method dispatcher with an allowlist.
-25. Add a strict content security policy and block unexpected navigation in every window.
-26. Fix language-change handling: the main-process callback currently references this.store incorrectly.
-27. Add Linux support for dialogs currently restricted to macOS and Windows.
-28. Recover off-screen windows after display changes and test mixed-DPI monitor movement.
-29. Make native picker helpers reproducible from source and test Apple Silicon/Windows architectures.
-30. Add unit, integration, and packaged-app tests across all supported operating systems.
-31. Modernize remaining dependencies and builder tooling with lockfile checks and vulnerability triage.
-32. Establish independent signed/notarized releases and authenticated private updates, without AWS or embedded tokens.
-
-## Migration baseline
-
-- Electron upgraded from 35.7.5 to 44.3.0, exact version and Yarn lockfile.
-- README credits TPGi / The Paciello Group, Cédric Trévisan, and original contributors.
-- Fresh local Git history; no upstream Git history or GitHub fork operation.
-- Upstream update checks disabled, publisher/release endpoints removed, inherited AWS signing removed.
-- Separate application ID and user-data directory to avoid overwriting upstream preferences.
-- Updated window-open handler, context-menu options, and clipboard rejection handling.
-- Manual-only build workflow prevents automatic CI expenditure on the first push.
-
-Sources checked on 2026-09-11:
-- Latest stable: https://releases.electronjs.org/
-- Migration/platform requirements: https://www.electronjs.org/docs/latest/breaking-changes
-
-Electron 44 requires macOS 13+ and drops 32-bit Electron builds.
-Native picker interaction, assistive technology behavior, Windows/Linux execution,
-and signed installers still require manual/platform validation.
+- Private independent GitHub repository: https://github.com/csullivan84/cca
+- Fresh Git root, no GitHub fork or imported upstream commit ancestry.
+- README credits TPGi, Cédric Trévisan and original contributors; GPL preserved.
+- Existing browser sign-in and SSH authentication avoided the invalid GitHub CLI token.
+- No AWS, new credentials, or upstream updater/publisher targets.
