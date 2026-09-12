@@ -1,33 +1,34 @@
 {
-    "name": "cca",
-    "version": "3.5.5",
-    "description": "Colour Contrast Analyser (CCA)",
-    "main": "src/main.js",
-    "private": true,
-    "scripts": {
-        "test": "electron scripts/smoke.cjs",
-        "start": "cross-env NODE_ENV=dev electron .",
-        "build": "electron-builder build --publish never"
-    },
-    "author": "C\u00e9dric Tr\u00e9visan <ctrevisan@tpgi.com>",
-    "license": "GPL-3.0",
-    "devDependencies": {
-        "cross-env": "^7.0.3",
-        "electron": "44.3.0",
-        "electron-builder": "^24.13.3"
-    },
-    "dependencies": {
-        "color-blind": "^0.1.3",
-        "color-convert": "^2.0.1",
-        "color-name": "^1.1.4",
-        "dotenv": "^16.4.5",
-        "electron-browser-storage": "^1.0.7",
-        "electron-log": "^5.1.7",
-        "electron-store": "^8.2.0",
-        "electron-updater": "^6.2.1",
-        "focus-visible": "^5.2.1",
-        "semver": "^7.6.3",
-        "simple-swizzle": "^0.2.2"
-    },
-    "packageManager": "yarn@1.22.22"
+  "name": "cca",
+  "version": "4.0.0",
+  "description": "Independent, accessible Colour Contrast Analyser",
+  "main": "src/main.js",
+  "private": true,
+  "author": "CCA contributors; based on TPGi and Cédric Trévisan's Colour Contrast Analyser",
+  "license": "GPL-3.0-or-later",
+  "scripts": {
+    "bundle": "node scripts/bundle.cjs",
+    "start": "npm run bundle && electron .",
+    "test": "node --test test/*.test.cjs",
+    "test:ui": "npm run bundle && playwright test",
+    "build": "npm run bundle && electron-builder --publish never",
+    "build:windows": "npm run bundle && electron-builder --win zip --x64 --publish never",
+    "build:windows:installer": "npm run bundle && electron-builder --win nsis --x64 --publish never",
+    "build:mac": "npm run bundle && electron-builder --mac --arm64 --publish never"
+  },
+  "dependencies": {
+    "color-blind": "0.1.3",
+    "culori": "4.0.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.63.0",
+    "axe-core": "4.13.0",
+    "electron": "44.3.0",
+    "electron-builder": "26.15.3",
+    "esbuild": "0.28.2"
+  },
+  "packageManager": "yarn@1.22.22",
+  "engines": {
+    "node": ">=22"
+  }
 }

@@ -1,286 +1,97 @@
-const { ipcMain, app, crashReporter } = require('electron')
-const log = require('electron-log/main')
-const path = require('node:path')
-// Clear logs every launch
-log.transports.file.getFile().clear()
-// initialize the logger for any renderer process
-log.initialize({ preload: true })
-// Redirect all console.* to logger
-Object.assign(console, log.functions)
-
-console.log('logs', app.getPath('logs'))
-app.setPath('userData', path.join(app.getPath('appData'), 'cca-independent'))
-app.setPath('crashDumps', path.join(app.getPath('logs'), 'crashes'))
-crashReporter.start({ uploadToServer: false })
-
-const Store = require('electron-store');
-const { checkForUpdates } = require('./update.js')
-const CCAController = require('./CCAcontroller')
-let browsers, controllers, mainController, setMenu, i18n
-
-// Set application name for Windows 10+ notifications
-if (process.platform === 'win32') app.setAppUserModelId(app.getName())
-
-// https://json-schema.org/understanding-json-schema/reference
-const schema = {
-    position : {
-        type: 'object',
-        properties: {
-            x: {
-                type: 'integer',
-            },
-            y: {
-                type: 'integer',
-            },
-        }
-    },
-    allowUpdates: {
-        type: 'boolean',
-        default: false,
-    },
-    checkForUpdates: {
-        type: 'boolean',
-        default: false,
-    },
-    rounding: {
-        type: 'number',
-        minimum: 0,
-        maximum: 3,
-        default: 1,
-    },
-    alwaysOnTop: {
-        type: 'boolean',
-        default: false,
-    },
-    lang: {
-        type: 'string',
-        default: 'auto',
-    },
-    localLang: {
-        type: 'string',
-        default: 'en',
-    },
-    colorScheme: {
-        type: 'string',
-        default: "system"
-    },
-    copy: {
-        type: 'object',
-        properties: {
-            regularTemplate: {
-                type: 'string',
-                default: '%i18n.f%: %f.hex%\n\
-%i18n.b%: %b.hex%\n\
-%i18n.cr%: %cr%:1\n\
-%i18n.1.4.3%\n\
-    %1.4.3%\n\
-%i18n.1.4.6%\n\
-    %1.4.6%\n\
-%i18n.1.4.11%\n\
-    %1.4.11%',
-            },
-            shortTemplate: {
-                type: 'string',
-                default: '%i18n.f%: %f.hex%\n\
-%i18n.b%: %b.hex%\n\
-%i18n.cr%: %cr%:1',
-            },
-        },
-        default: {}
-        // Replaced on first modification, to match the user lang.
-        //%i18n.f% : "Foreground"
-        //%i18n.b% : "Background"
-        //%i18n.cr% : "Contrast ratio"
-        //%i18n.1.4.3% : "1.4.3 Contrast (Minimum)"
-        //%i18n.1.4.6% : "1.4.6 Contrast (Enhanced)"
-        //%i18n.1.4.11% : "1.4.11 Non-text Contrast"
-    },
-    picker: {
-        type: 'integer',
-        default: (process.platform === 'win32' || process.platform === 'win64' || /^(msys|cygwin)$/.test(process.env.OSTYPE))?2:1, // Disable for Windows until https://github.com/electron/electron/issues/27980
-    },
-    foreground : {
-        type: 'object',
-        properties: {
-            format: {
-                type: 'string',
-                default: 'hex',
-            },
-            picker : {
-                type: 'object',
-                properties: {
-                    shortcut: {
-                        type: 'string',
-                        default: 'F11'
-                    }
-                },
-                default: {}
-            },
-            sliders : {
-                type: 'object',
-                properties: {
-                    open: {
-                        type: 'boolean',
-                        default: false,
-                    },
-                    tab: {
-                        type: 'string',
-                        default: 'rgb'
-                    }
-                },
-                default: {}
-            }
-        },
-        default: {}
-    },
-    background : {
-        type: 'object',
-        properties: {
-            format: {
-                type: 'string',
-                default: 'hex',
-            },
-            picker : {
-                type: 'object',
-                properties: {
-                    shortcut: {
-                        type: 'string',
-                        default: 'F12'
-                    }
-                },
-                default: {}
-            },
-            sliders : {
-                type: 'object',
-                properties: {
-                    open: {
-                        type: 'boolean',
-                        default: false,
-                    },
-                    tab: {
-                        type: 'string',
-                        default: 'rgb'
-                    }
-                },
-                default: {}
-            }
-        },
-        default: {}
-    }
+const { app, BrowserWindow, ipcMain, protocol, net, session, Menu, dialog, clipboard, shell, screen }=require('electron')
+const fs=require('node:fs')
+const fsp=require('node:fs/promises')
+const path=require('node:path')
+const {pathToFileURL}=require('node:url')
+const {defaults,validate,recoverBounds}=require('./core/state.cjs')
+const {report}=require('./core/analysis.cjs')
+const updates=require('./core/updates.cjs')
+const packageInfo=require('../package.json')
+const APP_URL='cca://app/index.html'
+protocol.registerSchemesAsPrivileged([{scheme:'cca',privileges:{standard:true,secure:true,supportFetchAPI:true,stream:true}}])
+app.setName('CCA')
+app.setAppUserModelId('com.csullivan84.cca')
+let win,state,storePath,saveTimer,pendingUpdate
+let dataDir=process.env.CCA_TEST_PROFILE
+if(!dataDir && process.platform==='win32') {
+  const root=path.dirname(app.getPath('exe'))
+  if(fs.existsSync(path.join(root,'portable.txt'))) dataDir=path.join(root,'data')
 }
-
-const store = new Store({schema,
-    migrations: {
-        '3.2.0': store => {
-            store.clear()
-        },
-        '3.3.0': store => {
-            store.delete('main')
-        },
-        '3.5.0': store => {
-            store.set('allowUpdates', false)
-        },
-    }
+dataDir=dataDir || path.join(app.getPath('appData'),'cca-independent')
+try{fs.mkdirSync(dataDir,{recursive:true});fs.accessSync(dataDir,fs.constants.W_OK)}catch{dataDir=path.join(app.getPath('appData'),'cca-independent');fs.mkdirSync(dataDir,{recursive:true})}
+app.setPath('userData',dataDir)
+storePath=path.join(dataDir,'workspace.json')
+let startupWarning=''
+function readState(){try{if(fs.statSync(storePath).size>1024*1024)throw new Error('Settings file too large');return validate(JSON.parse(fs.readFileSync(storePath,'utf8')))}catch(error){if(error.code!=='ENOENT'){startupWarning='Saved settings could not be read. A backup was kept; defaults are active.';try{fs.renameSync(storePath,storePath+'.corrupt-'+Date.now())}catch{}}return defaults()}}
+function save(){clearTimeout(saveTimer);try{const temp=storePath+'.tmp';fs.writeFileSync(temp,JSON.stringify(state),{mode:0o600});fs.renameSync(temp,storePath)}catch{if(win&&!win.isDestroyed())win.webContents.send('cca:notice','Could not save settings. Check free space and folder permissions.')}}
+function scheduleSave(){clearTimeout(saveTimer);saveTimer=setTimeout(save,200)}
+function trusted(event){return win && !win.isDestroyed() && event.sender===win.webContents && event.senderFrame===win.webContents.mainFrame && event.senderFrame.url===APP_URL}
+function handle(name,fn){ipcMain.handle('cca:'+name,async(event,...args)=>{if(!trusted(event))throw new Error('Untrusted IPC sender');return fn(...args)})}
+function text(value,max){if(typeof value!=='string'||value.length>max)throw new Error('Invalid text payload');return value}
+const languages=Object.fromEntries(fs.readdirSync(path.join(__dirname,'views/translations')).filter(f=>/^[a-z]{2}(?:-[A-Za-z]{2,4})?\.json$/.test(f)).map(f=>[f.slice(0,-5),JSON.parse(fs.readFileSync(path.join(__dirname,'views/translations',f),'utf8'))]))
+handle('load',()=>({state,version:packageInfo.version,platform:process.platform,portable:process.platform==='win32'&&dataDir===path.join(path.dirname(app.getPath('exe')),'data'),languages,startupWarning}))
+handle('save',input=>{const next=validate(input);next.bounds=state.bounds;state=next;win.setAlwaysOnTop(state.settings.alwaysOnTop);scheduleSave();return true})
+handle('copy',async value=>{await clipboard.writeText(text(value,200000));return true})
+handle('export',async(rows,type)=>{
+  if(!['html','txt','json','csv'].includes(type))throw new Error('Invalid export type')
+  const content=report(rows,type)
+  const result=await dialog.showSaveDialog(win,{title:'Export contrast report',defaultPath:`cca-report.${type}`,filters:[{name:type.toUpperCase(),extensions:[type]}]})
+  if(result.canceled)return false
+  await fsp.writeFile(result.filePath,content,'utf8');return true
 })
-
-// Expose 'electron-store' to Renderer-process through 'ipcMain.handle'
-ipcMain.handle('store',
-  async (_event, methodSign, ...args) => {
-    if (typeof (store)[methodSign] === 'function') {
-      return (store)[methodSign](...args)
-    }
-    return (store)[methodSign]
-  }
-)
-
-// Monitor store changes
-store.onDidChange('rounding', () => {
-    mainController.updateContrastRatio()
+handle('openHelp',async key=>{
+  const urls={minimum:'https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum.html',enhanced:'https://www.w3.org/WAI/WCAG22/Understanding/contrast-enhanced.html',nonText:'https://www.w3.org/WAI/WCAG22/Understanding/non-text-contrast.html',upstream:'https://github.com/ThePacielloGroup/CCAe'}
+  if(!Object.hasOwn(urls,key))throw new Error('Unknown help link')
+  await shell.openExternal(urls[key])
 })
-store.onDidChange('lang', async (newValue) => {
-    const localLang = await this.store.get('localLang')
-    i18n = new(require('./i18n'))(newValue, localLang)
-    setMenu(i18n)
-    mainController.sendEventToAll('langChanged')
-    mainController.updateLanguage()
-});
-store.onDidChange('colorScheme',(newValue)=> {
-    mainController.sendEventToAll("colorSchemeChanged",newValue);
+handle('updates',async()=>{const result=await updates.check(packageInfo.version);pendingUpdate=result.available?result.data:null;return {enabled:result.enabled,available:!!result.available,message:result.message}})
+handle('downloadUpdate',async()=>{
+  if(!pendingUpdate)throw new Error('Check for a signed update first')
+  const info=pendingUpdate
+  const result=await dialog.showSaveDialog(win,{title:'Save verified CCA update',defaultPath:`cca-${info.version}-${process.platform}-${process.arch}.zip`,filters:[{name:'ZIP archive',extensions:['zip']}]})
+  if(result.canceled)return false
+  await updates.download(info,result.filePath);return true
 })
-store.onDidChange('foreground.format', ()=>{
-    mainController.updateColor('foreground')
-})
-store.onDidChange('background.format', ()=>{
-    mainController.updateColor('background')
-})
-store.onDidChange('foreground.picker.shortcut', (newValue) => {
-    mainController.sendEventToAll('configChanged', 'foreground.picker.shortcut', newValue)
-})
-store.onDidChange('background.picker.shortcut', (newValue) => {
-    mainController.sendEventToAll('configChanged', 'background.picker.shortcut', newValue)
-})
-if (store.get('allowUpdates') === true) {
-    // If the CheckForUpdates preference changes, we trigger (or not) the check
-    store.onDidChange('checkForUpdates', (newValue) => {
-        if (newValue === true) {
-            checkForUpdates()
-                .then((newVersion) => {
-                    mainController.sendEventToAll('newVersion', newVersion)
-                })
-        }
-    })
+function createWindow(){
+  const bounds=recoverBounds(state.bounds,screen.getAllDisplays())
+  win=new BrowserWindow({...bounds,minWidth:360,minHeight:400,title:'CCA — Colour Contrast Analyser',show:false,alwaysOnTop:state.settings.alwaysOnTop,backgroundColor:'#f5f7fa',webPreferences:{preload:path.join(__dirname,'preload.cjs'),contextIsolation:true,nodeIntegration:false,sandbox:true,webSecurity:true,spellcheck:false}})
+  win.webContents.setWindowOpenHandler(()=>({action:'deny'}))
+  win.webContents.on('will-navigate',(event,url)=>{if(url!==APP_URL)event.preventDefault()})
+  win.webContents.on('will-redirect',event=>event.preventDefault())
+  win.webContents.on('will-attach-webview',event=>event.preventDefault())
+  win.webContents.on('context-menu',(_,params)=>{
+    if(params.isEditable || params.selectionText)Menu.buildFromTemplate([{role:'cut'},{role:'copy'},{role:'paste'},{role:'selectAll'}]).popup({window:win})
+  })
+  win.on('resize',()=>{if(!win.isMaximized()&&!win.isMinimized()){state.bounds=win.getBounds();scheduleSave()}})
+  win.on('move',()=>{if(!win.isMaximized()&&!win.isMinimized()){state.bounds=win.getBounds();scheduleSave()}})
+  win.once('ready-to-show',()=>win.show())
+  win.on('close',save)
+  win.on('closed',()=>{win=null})
+  win.loadURL(APP_URL)
 }
-
-// This method will be called when Electron has finished
-// initialization and is ready to create browser windows.
-// Some APIs can only be used after this event occurs.
-app.on('ready', async () => {
-//    const { screen } = require('electron')
-//    const displays = screen.getAllDisplays()
-//    console.log(displays)
-    const localLang = app.getLocale()
-    store.set('localLang', localLang)
-    console.log(store.path)
-    console.log(store.store)
-
-    const lang = await store.get('lang')
-    i18n = new(require('./i18n'))(lang, localLang)
-
-    browsers = require('./browsers')(__dirname, store)
-    controllers = require('./controllers')(browsers, store)
-    mainController = new CCAController(sendEventToAll, store)
-    setMenu = require('./menu.js')(browsers, mainController, store).setMenu
-
-    browsers.main.init()
-
-    setMenu(i18n)
-
-    // Initiate Update checking if required and allowed
-    if (store.get('allowUpdates') === true) {
-        if (store.get('checkForUpdates') === true) {
-            checkForUpdates()
-                .then((newVersion) => {
-                    mainController.sendEventToAll('newVersion', newVersion)
-                })
-        }
-    }
-})
-
-// Quit when all windows are closed.
-app.on('window-all-closed', () => {
-    // On macOS it is common for applications and their menu bar
-    // to stay active until the user quits explicitly with Cmd + Q
-    if (process.platform !== 'darwin') {
-        app.quit()
-    }
-})
-
-app.on('quit', () => {
-
-})
-
-function sendEventToAll(event, ...params) {
-    Object.keys(controllers).map(function(key, index) {
-        controllers[key].sendEvent(event, ...params)
+if(!app.requestSingleInstanceLock()){app.quit()}else{
+  app.on('second-instance',()=>{if(win){if(win.isMinimized())win.restore();win.show();win.focus()}})
+  app.whenReady().then(()=>{
+    state=readState()
+    protocol.handle('cca',request=>{
+      const url=new URL(request.url)
+      const allowed={'/index.html':'index.html','/app.bundle.js':'app.bundle.js','/style.css':'style.css'}
+      if(url.hostname!=='app'||!Object.hasOwn(allowed,url.pathname))return new Response('Not found',{status:404})
+      return net.fetch(pathToFileURL(path.join(__dirname,'ui',allowed[url.pathname])).href)
     })
+    session.defaultSession.setPermissionRequestHandler((contents,permission,callback)=>callback(false))
+    session.defaultSession.setPermissionCheckHandler(()=>false)
+    const action=name=>()=>win?.webContents.send('cca:action',name)
+    Menu.setApplicationMenu(Menu.buildFromTemplate([
+      {label:'CCA',submenu:[{label:'About CCA',accelerator:'F1',click:action('about')},{label:'Preferences',accelerator:'CmdOrCtrl+,',click:action('settings')},{type:'separator'},{role:'quit'}]},
+      {label:'Edit',submenu:[{role:'undo'},{role:'redo'},{type:'separator'},{role:'cut'},{role:'copy'},{role:'paste'},{role:'selectAll'},{type:'separator'},{label:'Read contrast result',click:action('read')},{label:'Copy contrast report',click:action('copy')},{label:'Undo colour change',click:action('undo')},{label:'Redo colour change',click:action('redo')}]},
+      {label:'View',submenu:[{role:'resetZoom'},{role:'zoomIn'},{role:'zoomOut'},{role:'togglefullscreen'},{label:'Centre window on primary display',click:()=>{if(win)win.setBounds(recoverBounds(null,screen.getAllDisplays()))}},{label:'Keyboard shortcuts',click:action('settings')}]}
+    ]))
+    createWindow()
+    const recover=()=>{if(win&&!win.isDestroyed())win.setBounds(recoverBounds(win.getBounds(),screen.getAllDisplays()))}
+    screen.on('display-removed',recover);screen.on('display-metrics-changed',recover)
+    app.on('activate',()=>{if(!win)createWindow();else win.show()})
+  }).catch(error=>{console.error(error);app.exit(1)})
+  app.on('window-all-closed',()=>{if(process.platform!=='darwin')app.quit()})
+  app.on('before-quit',()=>{if(state)save()})
 }

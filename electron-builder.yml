@@ -1,87 +1,48 @@
 appId: com.csullivan84.cca
-productName: Colour Contrast Analyser
-compression: maximum
+productName: CCA
+asar: true
+compression: normal
 directories:
   output: dist
 files:
-  - "**/*"
-releaseInfo:
-  releaseNotesFile: CHANGELOG.md
-extraResources:
-  - "resources/**"
-  - "icons/**"
-
+  - src/main.js
+  - src/preload.cjs
+  - src/core/**
+  - src/ui/index.html
+  - src/ui/style.css
+  - src/ui/app.bundle.js
+  - src/views/translations/**
+  - package.json
+  - LICENSE
+  - THIRD_PARTY_NOTICES.md
 mac:
   target:
-    - target: dmg
-      arch: universal
     - target: zip
-      arch: universal
-  hardenedRuntime: true
-  gatekeeperAssess: false
-  entitlements: "build/entitlements.mac.plist"
-  entitlementsInherit: "build/entitlements.mac.plist"
+      arch: [arm64, x64]
   category: public.app-category.developer-tools
-  artifactName: "${name}-${version}.${ext}"
-  icon: "build/icon.icns"
-  type: distribution
+  icon: build/icon.icns
+  hardenedRuntime: true
+  entitlements: build/entitlements.mac.plist
+  entitlementsInherit: build/entitlements.mac.plist
   notarize: false
-
-
-dmg:
-  sign: false
-
 win:
-  icon: "build/icon.ico"
+  icon: build/icon.ico
   target:
-    - target: nsis
-      arch:
-        - x64
-    - target: msi
-      arch:
-        - x64
-    - target: portable
-      arch:
-        - x64
-
+    - target: zip
+      arch: [x64]
+  signExecutable: false
 nsis:
-  artifactName: "${name}-Setup-${env.ARCH}-${version}.${ext}"
   oneClick: false
-  perMachine: true
-  allowElevation: true
+  perMachine: false
+  allowElevation: false
   allowToChangeInstallationDirectory: true
-  deleteAppDataOnUninstall: true
-  installerIcon: "build/icon.ico"
-  uninstallerIcon: "build/icon.ico"
-  uninstallDisplayName: "Uninstall Colour Contrast Analyser (CCA)"
-  createDesktopShortcut: true
-
-msi:
-  artifactName: "${name}-Setup-${version}.${ext}"
-  oneClick: false
-  perMachine: true
+  deleteAppDataOnUninstall: false
   createDesktopShortcut: true
   createStartMenuShortcut: true
-
-portable:
-  artifactName: "${name}-Portable-${env.ARCH}-${version}.${ext}"
-
+  artifactName: cca-setup-${version}-${arch}.${ext}
 linux:
-  icon: "build/icon.png"
-  category: "Utility"
-  desktop:
-    StartupNotify: "false"
-    Encoding: "UTF-8"
-    MimeType: "x-scheme-handler/deeplink"
-  target: ["AppImage", "rpm", "deb"]
-  artifactName: "${productName}-Setup-${version}.${ext}"
-
-deb:
-  priority: "optional"
-  #afterInstall:"installer/linux/after-install.tpl",
-
-#rpm:
-  #fpm: ["--before-install", "installer/linux/before-install.tpl"],
-  #afterInstall:"installer/linux/after-install.tpl",
-
+  icon: build/icon.png
+  category: Utility
+  target: [AppImage, deb]
+artifactName: cca-${version}-${os}-${arch}.${ext}
 publish: null

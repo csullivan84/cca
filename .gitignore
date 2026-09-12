@@ -58,3 +58,10 @@ typings/
 # dotenv environment variables file
 .env
 
+
+.modeldock/
+src/ui/app.bundle.js
+test-results/
+playwright-report/
+artifacts/
+*.zip
