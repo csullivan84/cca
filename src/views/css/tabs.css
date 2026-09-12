@@ -1,0 +1,28 @@
+ul[role=tablist] {
+    list-style: none;
+    margin: 0 0 0.5rem 0;
+    padding: 0;
+    text-align: center;
+}
+
+ul[role=tablist] > li {
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+}
+
+ul[role=tablist] > li > a {
+    margin: 0;
+    padding: 0.5rem 0.6rem;
+    color: var(--fg-primary);
+    text-decoration: none;
+    display: block;
+    background-color: var(--bg-primary);
+    border: 1px solid var(--fg-border-primary);
+}
+
+ul[role=tablist] > li > a[aria-selected="true"] {
+    color: white;
+    background-color: var(--bg-accent);
+    font-weight: bold;
+}

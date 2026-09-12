@@ -1,0 +1,195 @@
+*{color-scheme: var(--scheme-type);}
+html, body{
+    margin: 0;
+    font: caption; /* Default Operating System Font */
+    font-size: 100%;
+    color:var(--fg-primary);
+    background-color: var(--bg-primary);
+}
+
+:root {
+    --bg-primary:#fff;
+    --bg-secondary:#f5f5f5;
+    --bg-paraphrased:#dadada;
+    --bg-control-primary: #dfdfdf;
+    --bg-accent:#1B75BC;
+    --bg-summary:#151515;
+    --bg-details:#ECECEC;
+    --bg-pressed-icon: var(--bg-accent);
+    --fg-primary:#000;
+    --fg-paraphrased:#222;
+    --bg-code:var(--bg-paraphrased);
+    --fg-border-primary:#ccc;
+    --fg-border-secondary:#aaa;
+    --fg-link:#4865FF;
+    --bg-code:#ccc;
+    --fg-control-border-primary: #8f8f8f;
+    --fg-pressed-icon: white;
+    --icon-color: light-dark(black, white);
+    --icon-switch:url("../icons/switch-black.svg");
+    --icon-sliders:url("../icons/sliders-black.svg");
+    --icon-picker:url("../icons/picker-black.svg");
+    --icon-help:url("../icons/help-black.svg");
+    --scheme-type:light;
+    --border-radius: 3px;
+}
+
+@media ( prefers-color-scheme : dark ) {
+    :root {
+        --bg-primary:#121212;
+        --bg-secondary:#1f1f1f;
+        --bg-control-primary: #343434;
+        --bg-summary:#2f2f2f;
+        --bg-details:var(--bg-summary);
+        --bg-paraphrased:#1f1f1f;
+        --fg-paraphrased:#dadada;
+        --bg-code:var(--bg-paraphrased);
+        --fg-primary:#fff;
+        --fg-border-primary:#666;
+        --fg-border-secondary:#5a5a5a;
+        --fg-control-border-primary: #6f6f6f;
+        --fg-link:#58A5FF;
+        --scheme-type:dark;
+    }
+}
+
+@media (forced-colors: active) {
+    :root {
+        --icon-color: ButtonText;
+        --bg-pressed-icon: SelectedItem;
+        --fg-pressed-icon: SelectedItemText;
+    }
+}
+
+html.force-light {
+    --bg-primary:#fff;
+    --bg-secondary:#f5f5f5;
+    --bg-paraphrased:#dadada;
+    --bg-control-primary: #dfdfdf;
+    --bg-accent:#1B75BC;
+    --bg-summary:#151515;
+    --bg-details:#ECECEC;
+    --fg-primary:#000;
+    --fg-paraphrased:#222;
+    --bg-code:var(--bg-paraphrased);
+    --fg-border-primary:#bbb;
+    --fg-border-secondary:#aaa;
+    --fg-link:#4865FF;
+    --fg-control-border-primary: #8f8f8f;
+    --icon-switch:url("../icons/switch-black.svg");
+    --icon-sliders:url("../icons/sliders-black.svg");
+    --icon-picker:url("../icons/picker-black.svg");
+    --icon-help:url("../icons/help-black.svg");
+    --scheme-type:light;
+}
+
+html.force-dark {
+    --bg-primary:#121212;
+    --bg-secondary:#1f1f1f;
+    --bg-control-primary: #343434;
+    --bg-summary:#2f2f2f;
+    --bg-details:var(--bg-summary);
+    --bg-paraphrased:#1f1f1f;
+    --bg-code:var(--bg-paraphrased);
+    --fg-primary:#fff;
+    --fg-paraphrased:#dadada;
+    --fg-border-primary:#666;
+    --fg-border-secondary:#5a5a5a;
+    --fg-control-border-primary: #6f6f6f;
+    --fg-link:#58A5FF;
+    --scheme-type:dark;
+}
+
+h1 {
+    font-size: 1rem;
+    margin: 0;
+    padding: 0;
+}
+
+h2 {
+    font-size: 1rem;
+    margin: 0;
+    padding: 0;
+}
+
+h3 {
+    font-size: 0.9rem;
+    margin: 0;
+    padding: 0;
+}
+
+a {
+    color: var(--fg-link);
+}
+
+button, input {
+    font-size: 1.2rem;
+    color-scheme: var(--scheme-type);
+    border-color: var(--fg-control-border-primary);
+    border-style: solid;
+    border-width: 1px;
+}
+
+input[type=number] {
+    background-color: var(--bg-secondary);
+    color: var(--fg-primary);
+}
+select {
+    color-scheme: var(--scheme-type);
+    font-size: 1rem;
+    background-color: var(--bg-secondary);
+    color: var(--fg-primary);
+}
+:focus {
+    outline-color: orangered;
+    outline-width: 3px;
+}
+
+button:focus {
+    outline-offset: -1px;
+}
+
+code {
+    font-size: 1.1em;
+    background: var(--bg-code);
+    padding: 0.025em 0.3em;
+    border: 1px var(--fg-border-secondary) solid;
+    border-radius: 3px;
+}
+
+.sr-only {
+    clip: rect(1px 1px 1px 1px) !important; /* IE 6/7 */
+    clip: rect(1px, 1px, 1px, 1px) !important;
+    -webkit-clip-path: inset(50%) !important;
+    clip-path: inset(50%) !important;
+    height: 1px;
+    overflow: hidden;
+    position: absolute;
+    white-space: nowrap;
+    width: 1px;
+}
+
+.js-focus-visible :focus {
+    outline: 0.25em rgba(0,0,0,0.4) solid;
+    box-shadow: 0 0 0.25em 0.1em rgba(255,255,255,0.8);
+}
+
+/* https://github.com/WICG/focus-visible */
+.js-focus-visible :focus:not(.focus-visible) {
+    outline: none;
+    box-shadow: initial;
+}
+
+button[title]:focus:after  {
+    content:attr(title);
+    background-color: black;
+    color: white;
+    padding: 5px;
+    margin-top: 1rem;
+    margin-left: -1rem;
+    position: absolute;
+    max-width: 20rem;
+    border-radius: 5px;
+    z-index: 1;
+    font-size: 0.8rem;
+}

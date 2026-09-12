@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <title>Colour Contrast Analyser (CCA)</title>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/main.css" />
+    <link rel="stylesheet" href="css/tabs.css" />
+  </head>
+  <body>
+    <main>
+      <h1 class="sr-only">CCA Main windows</h1>
+      <section id="updateAvailable" hidden>
+        <div class="flex">
+          <div class="content"></div>
+          <button aria-label="Close">X</button>
+        </div>
+      </section>
+      <section id="foreground-color">
+        <h2>Foreground colour</h2>
+        <div class="container">
+          <select id="foreground-format-selector" class="format-selector" aria-label="Select default format for foreground colour">
+            <option value="hex">HEX</option>
+            <option value="hexa">HEXa</option>
+            <option value="rgb">RGB</option>
+            <option value="rgba">RGBa</option>
+            <option value="hsl">HSL</option>
+            <option value="hsla">HSLa</option>
+            <option value="hsv">HSV</option>
+            <option value="hsva">HSVa</option>
+          </select>
+          <input type="text" class="free-value" aria-label="Foreground colour value" aria-describedby="foreground-free-format" />
+          <div id="foreground-free-format" class="free-format sr-only"></div>
+        </div>
+        <div class="name-value"></div>
+        <div class="buttons">
+          <button class="switch" aria-label="Switch Colours" title="Switch Colours"></button>
+          <button class="sliders" aria-label="Foreground colour sliders" title="Colour sliders" aria-controls="foreground-sliders" aria-expanded="false"></button>
+          <button class="picker" aria-label="Foreground colour picker" title="Colour picker"  aria-pressed="false"></button>
+          <button class="help" aria-label="Foreground help" title="Help" aria-controls="foreground-help" aria-expanded="false"></button>
+        </div>
+      </section>
+      <section id="foreground-help" hidden>
+        <span class="title">Supported formats are:</span>
+        <ul>
+          <li>Hex: <code>#FFF</code>, <code>#FFFFFF</code>, <code>#FFFA</code>, <code>#FFFFFFAA</code></li>
+          <li class="names">Names: <code>blue</code>, <code>grey</code>, <code>orange</code>, ...</li>
+          <li>RGB: <code>rgb(200,200,200)</code>, <code>rgba(200,60,60,0.3)</code></li>
+          <li>HSL: <code>hsl(360,100%,50%)</code>, <code>hsla(360,60%,50%,0.4)</code></li>
+          <li>HSV: <code>hsv(360,100%,50%)</code>, <code>hsva(360,60%,50%,0.4)</code></li>
+        </ul>
+      </section>
+      <section id="foreground-sliders" hidden>
+        <ul id="foreground-tabs" role="tablist">
+          <li role="presentation">
+            <a href="#foreground-rgb"
+            role="tab"
+            id="foreground-rgb-tab"
+            tabindex="0"
+            aria-controls="foreground-rgb"
+            aria-selected="false"
+            data-tab="rgb">RGB</a>
+          </li>
+          <li role="presentation">
+            <a href="#foreground-hsl"
+            role="tab"
+            id="foreground-hsl-tab"
+            tabindex="-1"
+            aria-controls="foreground-hsl"
+            aria-selected="false"
+            data-tab="hsl">HSL</a>
+          </li>
+          <li role="presentation">
+            <a href="#foreground-hsv"
+            role="tab"
+            id="foreground-hsv-tab"
+            tabindex="-1"
+            aria-controls="foreground-hsv"
+            aria-selected="false"
+            data-tab="hsv">HSV</a>
+          </li>
+        </ul>
+        <div role="tabpanel" id="foreground-rgb" aria-labelledby="foreground-rgb-tab"
+        aria-expanded="false" hidden>
+            <h2 class="sr-only">Foreground RGB input</h2>
+            <div class="sync">
+              <label>
+                <input type="checkbox" aria-label="Synchronize foreground colour values">
+                <span>Synchronize colour values</span>
+              </label>
+            </div>
+            <div class="slider slider-rgb red">
+              <label class="slider-lb red">Red</label>
+              <input aria-label="Foreground red input" type="range" min="0" max="255" value="0" />
+              <input aria-label="Foreground red input" type="number" maxlength="3" />
+            </div>
+            <div class="slider slider-rgb green">
+              <label class="slider-lb green">Green</label>
+              <input aria-label="Foreground green input" type="range" min="0" max="255" value="0" />
+              <input aria-label="Foreground green input" type="number" maxlength="3" />
+            </div>
+            <div class="slider slider-rgb blue">
+              <label class="slider-lb blue">Blue</label>
+              <input aria-label="Foreground blue input" type="range" min="0" max="255" value="0" />
+              <input aria-label="Foreground blue input" type="number" maxlength="3" />
+            </div>
+            <div class="slider slider-rgb alpha">
+              <label class="slider-lb alpha">Alpha</label>
+              <input aria-label="Foreground alpha input" type="range" min="0" max="1" value="1" step="0.01" />
+              <input aria-label="Foreground alpha input" type="number" min="0" max="1" step="0.0001" />
+            </div>
+          </div>
+        </div>
+        <div role="tabpanel" id="foreground-hsl" aria-labelledby="foreground-hsl-tab"
+        aria-expanded="false" hidden>
+            <h2 class="sr-only">Foreground HSL input</h2>
+            <div class="slider slider-hsl hue">
+              <label class="slider-lb hue">Hue</label>
+              <input aria-label="Foreground hue input" type="range" min="0" max="359" value="0" />
+              <input aria-label="Foreground hue input" type="number" maxlength="3" />
+            </div>
+            <div class="slider slider-hsl saturationl">
+              <label class="slider-lb saturation">Saturation</label>
+              <input aria-label="Foreground saturationl input" type="range" min="0" max="100" value="0" />
+              <input aria-label="Foreground saturationl input" type="number" maxlength="3" />
+            </div>
+            <div class="slider slider-hsl lightness">
+              <label class="slider-lb lightness">Lightness</label>
+              <input aria-label="Foreground lightness input" type="range" min="0" max="100" value="0" />
+              <input aria-label="Foreground lightness input" type="number" maxlength="3" />
+            </div>
+            <div class="slider slider-hsl alpha">
+              <label class="slider-lb alpha">Alpha</label>
+              <input aria-label="Foreground alpha input" type="range" min="0" max="1" value="1" step="0.01" />
+              <input aria-label="Foreground alpha input" type="number" min="0" max="1" step="0.0001" />
+            </div>
+          </div>
+        </div>
+        <div role="tabpanel" id="foreground-hsv" aria-labelledby="foreground-hsv-tab"
+        aria-expanded="false" hidden>
+            <h2 class="sr-only">Foreground HSV input</h2>
+            <div class="slider slider-hsv hue">
+              <label class="slider-lb hue">Hue</label>
+              <input aria-label="Foreground hue input" type="range" min="0" max="359" value="0" />
+              <input aria-label="Foreground hue input" type="number" maxlength="3" />
+            </div>
+            <div class="slider slider-hsv saturationv">
+              <label class="slider-lb saturation">Saturation</label>
+              <input aria-label="Foreground saturationv input" type="range" min="0" max="100" value="0" />
+              <input aria-label="Foreground saturationv input" type="number" maxlength="3" />
+            </div>
+            <div class="slider slider-hsv value">
+              <label class="slider-lb value">Value</label>
+              <input aria-label="Foreground value input" type="range" min="0" max="100" value="0" />
+              <input aria-label="Foreground value input" type="number" maxlength="3" />
+            </div>
+            <div class="slider slider-hsv alpha">
+              <label class="slider-lb alpha">Alpha</label>
+              <input aria-label="Foreground alpha input" type="range" min="0" max="1" value="1" step="0.01" />
+              <input aria-label="Foreground alpha input" type="number" min="0" max="1" step="0.0001" />
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="background-color">
+        <h2>Background colour</h2>
+        <div class="container">
+          <select id="background-format-selector" class="format-selector" aria-label="Select default format for background colour">
+            <option value="hex">HEX</option>
+            <option value="rgb">RGB</option>
+            <option value="hsl">HSL</option>
+            <option value="hsv">HSV</option>
+          </select>
+          <input type="text" class="free-value" aria-label="Background colour value" aria-describedby="background-help" />
+          <div id="background-free-format" class="free-format sr-only"></div>
+        </div>
+        <div class="name-value"></div>
+        <div class="buttons">
+            <button class="sliders" aria-label="Background colour sliders" title="Colour sliders" aria-controls="background-sliders" aria-expanded="false"></button>
+            <button class="picker" aria-label="Background colour picker" title="Colour picker" aria-pressed="false"></button>
+            <button class="help" aria-label="Background help" title="Help" aria-controls="background-help" aria-expanded="false"></button> 
+        </div>
+      </section>
+      <section id="background-help" hidden>
+        <span class="title">Supported formats are:</span>
+        <ul>
+          <li>Hex: <code>#FFF</code>, <code>#FFFFFF</code>, <code>#FFFA</code>, <code>#FFFFFFAA</code></li>
+          <li class="names">Names: <code>blue</code>, <code>grey</code>, <code>orange</code>, ...</li>
+          <li>Names: <code>blue</code>, <code>grey</code>, <code>orange</code>, ...</li>
+          <li>RGB: <code>rgb(200,200,200)</code></li>
+          <li>HSL: <code>hsl(360,100%,50%)</code></li>
+          <li>HSV: <code>hsv(360,100%,50%)</code></li>
+        </ul>
+      </section>
+      <section id="background-sliders" hidden>
+          <ul id="background-tabs" role="tablist">
+            <li role="presentation">
+              <a href="#background-rgb"
+              role="tab"
+              id="background-rgb-tab"
+              tabindex="0"
+              aria-controls="background-rgb"
+              aria-selected="false"
+              data-tab="rgb">RGB</a>
+            </li>
+            <li role="presentation">
+              <a href="#background-hsl"
+              role="tab"
+              id="background-hsl-tab"
+              tabindex="-1"
+              aria-controls="background-hsl"
+              aria-selected="false"
+              data-tab="hsl">HSL</a>
+            </li>
+            <li role="presentation">
+              <a href="#background-hsv"
+              role="tab"
+              id="background-hsv-tab"
+              tabindex="-1"
+              aria-controls="background-hsv"
+              aria-selected="false"
+              data-tab="hsv">HSV</a>
+            </li>
+          </ul>
+          <div role="tabpanel" id="background-rgb" aria-labelledby="background-rgb-tab"
+          aria-expanded="false" hidden>
+            <h2 class="sr-only">Background RGB input</h2>
+            <div class="sync">
+              <label>
+                <input type="checkbox" aria-label="Synchronize background colour values">
+                <span>Synchronize colour values</span>
+              </label>
+            </div>
+            <div class="slider slider-rgb red">
+              <label class="slider-lb red">Red</label>
+              <input aria-label="Background red input" type="range" min="0" max="255" value="0" />
+              <input aria-label="Background red input" type="number" maxlength="3" />
+            </div>
+            <div class="slider slider-rgb green">
+              <label class="slider-lb green">Green</label>
+              <input aria-label="Background green input" type="range" min="0" max="255" value="0" />
+              <input aria-label="Background green input" type="number" maxlength="3" />
+            </div>
+            <div class="slider slider-rgb blue">
+              <label class="slider-lb red">Blue</label>
+              <input aria-label="Background blue input" type="range" min="0" max="255" value="0" />
+              <input aria-label="Background blue input" type="number" maxlength="3" />
+            </div>
+          </div>
+        </div>
+        <div role="tabpanel" id="background-hsl" aria-labelledby="background-hsl-tab"
+        aria-expanded="false" hidden>
+            <h2 class="sr-only">Background HSL input</h2>
+            <div class="slider slider-hsl hue">
+              <label class="slider-lb hue">Hue</label>
+              <input aria-label="Background hue input" type="range" min="0" max="359" value="0" />
+              <input aria-label="Background hue input" type="number" maxlength="3" />
+            </div>
+            <div class="slider slider-hsl saturationl">
+              <label class="slider-lb Saturation">Saturation</label>
+              <input aria-label="Background saturationl input" type="range" min="0" max="100" value="0" />
+              <input aria-label="Background saturationl input" type="number" maxlength="3" />
+            </div>
+            <div class="slider slider-hsl lightness">
+              <label class="slider-lb lightness">Lightness</label>
+              <input aria-label="Background lightness input" type="range" min="0" max="100" value="0" />
+              <input aria-label="Background lightness input" type="number" maxlength="3" />
+            </div>
+          </div>
+        </div>
+        <div role="tabpanel" id="background-hsv" aria-labelledby="background-hsv-tab"
+        aria-expanded="false" hidden>
+            <h2 class="sr-only">Background HSV input</h2>
+            <div class="slider slider-hsv hue">
+              <label class="slide-label hue">Hue</label>
+              <input aria-label="Background hue input" type="range" min="0" max="359" value="0" />
+              <input aria-label="Background hue input" type="number" maxlength="3" />
+            </div>
+            <div class="slider slider-hsv saturationv">
+              <label class="slider-lb saturation">Saturation</label>
+              <input aria-label="Background saturationv input" type="range" min="0" max="100" value="0" />
+              <input aria-label="Background saturationv input" type="number" maxlength="3" />
+            </div>
+            <div class="slider slider-hsv value">
+              <label class="slider-lb value">Value</label>
+              <input aria-label="Background value input" type="range" min="0" max="100" value="0" />
+              <input aria-label="Background value input" type="number" maxlength="3" />
+            </div>
+          </div>
+        </div>
+      </section>
+      <section id="sample-preview">
+        <details open>
+          <summary><h2>Sample preview</h2></summary>
+          <div class="preview-box">
+            <div class="text" contenteditable="true">example text showing contrast</div>
+            <div class="icon">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" aria-labelledby="Example icon/image"
+                role="img" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <path data-name="layer1"
+                fill="none" stroke-miterlimit="10" d="M52 32h8v-8" stroke-width="4"
+                stroke-linejoin="round" stroke-linecap="round"></path>
+                <path data-name="layer1" fill="none" stroke-miterlimit="10"
+                d="M60 32L42 16l-12 6L12 4m0 56V20H4v40" stroke-width="4" stroke-linejoin="round"
+                stroke-linecap="round"></path>
+                <path data-name="layer2" fill="none" stroke-miterlimit="10"
+                d="M28 60V40h-8v20" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"></path>
+                <path data-name="layer1" fill="none" stroke-miterlimit="10"
+                d="M44 60V34h-8v26" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"></path>
+                <path data-name="layer2" fill="none" stroke-miterlimit="10"
+                d="M60 60V48h-8v12" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"></path>
+                <path data-name="layer1" fill="none" stroke-miterlimit="10"
+                d="M2 60h60" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"></path>
+              </svg>
+            </div>
+          </div>
+        </details>
+      </section>
+
+      <section id="results">
+        <header>
+          <h2>WCAG 2.1 results</h2>
+          <div id="contrast-ratio" aria-live="polite" aria-atomic="true">
+            <h3>Contrast ratio</h3>
+            <div id="contrast-ratio-value">99.9:1</div>
+          </div>
+        </header>
+        <details id="criteria_1-4-3">
+          <summary><h3>1.4.3 Contrast (Minimum) (AA)</h3></summary>
+          <p><small><span class="paraphrased">Paraphrased</span><span class="sr-only">:</span></small> <span id="sc_1_4_3">Text (including images of text) has a contrast ratio of at least <strong>4.5:1</strong> for "regular" sized text and at least <strong>3:1</strong> for large scale text (at least <code>18pt</code> / <code>24px</code>, or bold and at least <code>14pt</code> / <code>18.5px</code>), unless the text is purely decorative.</span></p>
+        </details>
+        <div id="contrast-level-1-4-3" class="contrast-level">Pass</div>
+        
+        <details id="criteria_1-4-6">
+          <summary><h3>1.4.6 Contrast (Enhanced) (AAA)</h3></summary>
+          <p><small><span class="paraphrased">Paraphrased</span><span class="sr-only">:</span></small> <span id="sc_1_4_6">Text (including images of text) has a contrast ratio of at least <strong>7:1</strong> for "regular" sized text and at least <strong>4.5:1</strong> for large scale text (at least <code>18pt</code> / <code>24px</code>, or bold and at least <code>14pt</code> / <code>18.5px</code>), unless the text is purely decorative.</span></p>
+        </details>
+        <div id="contrast-level-1-4-6"  class="contrast-level">Pass</div>
+        
+        <details id="criteria_1-4-11">
+          <summary><h3>1.4.11 Non-text Contrast (AA)</h3></summary>
+          <p><small><span class="paraphrased">Paraphrased</span><span class="sr-only">:</span></small> <span id="sc_1_4_11">The visual presentation of user interface components (their states – including focus indication – and boundaries) and graphical objects has a contrast ratio of at least <strong>3:1</strong> against adjacent colour(s)</span></p>
+        </details>
+        <div id="contrast-level-1-4-11" class="contrast-level">Pass</div>
+      </section>
+      <div class="sr-announcer sr-only" aria-atomic="true" aria-live="polite" aria-relevant="additions text"></div>
+    </main>
+    <script src="js/tabs.js"></script>
+    <script>
+      // You can also require other files to run in this process
+      require('./js/main.js')
+      require('../../node_modules/focus-visible/dist/focus-visible.min.js');
+      </script>
+  </body>
+</html>

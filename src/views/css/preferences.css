@@ -1,0 +1,45 @@
+body {
+    padding: 1rem;
+}
+
+.buttons {
+    text-align: right;
+    margin: 1rem;
+}
+
+.option:not([hidden]) {
+    display: flex;
+    justify-content: space-between;
+    padding-top: 0.5rem;
+}
+
+.option select, .width-8 {
+    min-width: 8rem;
+}
+
+.block {
+    display: block;
+    padding: 0.2rem;
+}
+
+textarea {
+    width: 100%;
+    display: block;
+}
+
+.reset-button {
+    font-size: 0.9rem;
+}
+
+#copy ul {
+    margin: 0 0 0.5rem 0;
+    padding: 0;
+    columns: 2;
+    -webkit-columns: 2;
+    -moz-columns: 2;
+}
+
+#copy ul li {
+    font-size: 0.8rem;
+    margin: 0 0 0 0.5rem;
+}

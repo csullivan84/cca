@@ -1,0 +1,397 @@
+body, html{
+    height: 100%;
+    user-select: none;
+    cursor:default;
+}
+
+body{
+    overflow: hidden;
+}
+
+.black {
+    color: #000;
+}
+.white {
+    color: #fff;
+}
+
+section {
+    position: relative;
+    border-top: 1px solid var(--fg-border-primary);
+}
+
+*[contenteditable="true"] {
+    user-select: text;
+    cursor: text;
+}
+
+summary h2, summary h3 {
+    display: inline-block;
+}
+
+section#foreground-color h2,
+section#background-color h2 {
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+}
+
+section {
+    padding: 0.5rem;
+}
+
+/* Color sections */
+section#foreground-color,
+section#background-color {
+    display: flex;
+    align-items: center;
+    min-height: 6rem;
+    font-size: 1.4rem;
+    justify-content: center;
+    forced-color-adjust: none;
+}
+
+section#foreground-color .buttons,
+section#background-color .buttons {
+    position: absolute;
+    bottom: 0.5rem;
+    right: 0.5rem;
+}
+
+
+/* Free text input */
+
+section#foreground-color .container,
+section#background-color .container {
+    position: relative;
+    width: 100%;
+    margin: auto;
+    text-align: center;
+    display: flex;
+    justify-content: center;
+    align-content: center;
+    align-items: center;
+}
+
+section#foreground-color input.free-value,
+section#background-color input.free-value  {
+    appearance: none;
+    -webkit-appearance: none;
+    border: 1px var(--fg-border-primary) dashed;
+    padding: 0.2rem;
+    background: transparent;
+    text-align: center;
+    font-size: 1.4rem;
+    color: inherit;
+    width: 18rem;
+}
+
+section#foreground-color select.format-selector,
+section#background-color select.format-selector  {
+    padding: 0.2rem 0.5rem 0.1rem 0.5rem;
+    border-radius: 0.2rem;
+    position: absolute;
+    left: 5px;
+    display: block;
+    min-width: 4.6rem;
+    padding: 0.1rem;
+    forced-color-adjust: auto;
+}
+
+section#foreground-color input[aria-invalid="true"].free-value,
+section#background-color input[aria-invalid="true"].free-value {
+    color: #000000;
+    background: #ffffff url('../icons/warning.png') 98% 50% no-repeat;
+    background-size: contain;
+}
+
+section#foreground-color .name-value,
+section#background-color .name-value {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    font-style: italic;
+    font-size: 1.2rem;
+}
+
+section#foreground-color input.free-value:focus,
+section#background-color input.free-value:focus {
+    appearance: textfield;
+    -webkit-appearance: textfield;
+    border: 1px solid var(--fg-border-primary);
+    color: var(--fg-primary);
+    background: var(--bg-primary);
+}
+
+section#foreground-color button,
+section#background-color button {
+    background-color: var(--bg-control-primary);
+    forced-color-adjust: auto;
+    width: 2rem;
+    height: 1.2rem;
+    border: 1px solid var(--fg-border-primary);
+    border-radius: 0.2rem;
+    padding: 0.5em;
+    position: relative;
+
+    &::before {
+        content: "";
+        position: absolute;
+        inset: 5%;
+        mask-image: var(--icon);
+        mask-position: 50% 50%;
+        mask-repeat: no-repeat;
+        background-color: var(--icon-color);
+    }
+}
+
+section#foreground-color button.picker,
+section#background-color button.picker {
+    --icon: var(--icon-picker);
+}
+
+section#foreground-color button.sliders,
+section#background-color button.sliders {
+    --icon: var(--icon-sliders);
+}
+
+section#foreground-color button.help,
+section#background-color button.help {
+    --icon: var(--icon-help);
+}
+
+section#foreground-color button.switch {
+    --icon: var(--icon-switch);
+}
+
+section#foreground-color button[aria-pressed=true],
+section#foreground-color button[aria-expanded=true],
+section#background-color button[aria-pressed=true],
+section#background-color button[aria-expanded=true]{
+    box-shadow:inset 0 0 0.1em 0.1em rgba(0, 0, 0, 0.4);
+    background-color: var(--bg-pressed-icon);
+    --icon-color: var(--fg-pressed-icon);
+}
+
+/* Sliders */
+section#foreground-sliders,
+section#background-sliders {
+    border-bottom: 1px #ddd solid;
+}
+
+section#foreground-sliders .slider,
+section#background-sliders .slider {
+    display: grid;
+    grid-template-columns: 4rem 1fr 2.5rem;
+    margin-bottom: 1px;
+}
+
+section#foreground-sliders .slider label,
+section#background-sliders .slider label {
+    font-size: 0.8em;
+}
+
+section#foreground-sliders input[type=number],
+section#background-sliders input[type=number] {
+    width: 2.5rem;
+    text-align: center;
+    font-size: 0.8rem;
+}
+section#foreground-sliders input[type=range],
+section#background-sliders input[type=range] {
+    margin: 0 0.5rem 0 0.5rem;
+}
+
+section#foreground-sliders input[type=number]::-webkit-inner-spin-button,
+section#foreground-sliders input[type=number]::-webkit-outer-spin-button,
+section#background-sliders input[type=number]::-webkit-inner-spin-button,
+section#background-sliders input[type=number]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0;
+}
+
+/* RGB input sections */
+#foreground-rgb .sync,
+#background-rgb .sync {
+    margin: 0 0 0.5rem 0;
+}
+
+#foreground-rgb .sync input,
+#background-rgb .sync input {
+    margin: 0 0 0.05em 0;
+    vertical-align: text-bottom;
+}
+
+#foreground-rgb .sync label,
+#background-rgb .sync label {
+    font-size: 0.8em;
+}
+
+/* Help section */
+section#foreground-help,
+section#background-help {
+    background: var(--bg-secondary);
+    line-height: 1.5;
+}
+
+/* Sample preview section */
+section#sample-preview {
+    background-color: var(--bg-details);
+}
+
+@media (forced-colors: active) {
+    /* In High Contrast Theme, make the summary more similar to the results summary */
+    section#sample-preview summary {
+        border-radius: var(--border-radius);
+        background: ButtonFace;
+        color: ButtonText;
+        border: 1px solid ButtonText;
+        padding: 0.5rem 1rem;
+    }
+}
+
+
+section#sample-preview .preview-box {
+    display: flex;
+    align-items: center;
+    min-height: 5rem;
+    font-size: 1.4rem;
+    justify-content: center;
+    forced-color-adjust: none;
+}
+
+section#sample-preview .preview-box .text {
+    border: 1px var(--fg-border-primary) dashed;
+    padding: 0.5rem;
+}
+
+section#sample-preview .icon {
+    margin-left: 1rem;
+    padding: 0.5rem;
+    border: 1px #cccccc dashed;
+}
+
+section#sample-preview .icon svg {
+    width: 2rem;
+    height: 2rem;
+}
+
+/* Results section */
+
+#contrast-ratio {
+    margin-right: 0.5rem;
+    background-color: var(--bg-primary);
+    border: 1px solid var(--fg-border-primary);
+    text-align: center;
+    padding: 0 0.5rem;
+}
+
+#contrast-ratio h3 {
+    font-size: 0.7rem;
+}
+
+#contrast-ratio-value {
+    font-size: 1.2rem;
+}
+
+#contrast-ratio-value .smaller{
+    font-size: 1rem;
+}
+
+section#results {
+    background-color: var(--bg-primary);
+}
+
+section#results header {
+    display: flex;
+    justify-content: space-between;
+}
+
+section#results details {
+    margin: 0.5rem;
+    border-radius: var(--border-radius);
+    background: var(--bg-details);
+}
+
+section#results summary {
+    background: var(--bg-summary);
+    color: #FFF;
+    border-radius: var(--border-radius);
+    padding: 0.5rem 1rem;
+}
+
+section#results details[open] summary {
+    background: var(--bg-accent);
+    /* Remove the radius on the bottom of the details so its edges
+       connect with the one from the details text */
+    border-radius: var(--border-radius) var(--border-radius) 0 0;
+}
+
+@media (forced-colors: active) {
+    section#results details summary {
+        background: ButtonFace;
+        color: ButtonText;
+        border: 1px solid ButtonText;
+    }
+
+    /* In regular mode, the details text has a --bg-details background color
+       that makes the text looks like it's related to the summary.
+       Since we can't use a specific background color in High Contrast Theme,
+       add a border to achieve the same goal.  */
+     section#results details summary + p {
+        border: 1px solid CanvasText;
+        /* Don't display a border at the top to avoid clashing with the summary bottom border */
+        border-block-start: none;
+    }
+
+     section#results details[open] summary {
+        background: SelectedItem;
+        color: SelectedItemText;
+        /* Opt-out of forced colors to avoid the backplating on the marker and the h3 */
+        forced-color-adjust: none;
+    }
+}
+
+section#results details p {
+    padding: 0.5rem 0.5rem 0.5rem 2rem;
+    margin: 0;
+}
+
+section#results details p small {
+    background: var(--bg-paraphrased);
+    color: var(--fg-paraphrased);
+    padding: 0.1em 0.25em;
+    border: 1px #666 solid;
+    border-radius: 2px;
+    font-size: 0.75em;
+}
+
+section#results .contrast-level {
+    margin-left: 2.5rem;
+    display: flex;
+    justify-content: space-evenly;
+}
+
+section#results .contrast-level > div{
+    flex-grow: 1;
+    width: 50%;
+}
+
+section#results .contrast-level img {
+    height: 1.2rem;
+    width: 1.2rem;
+    margin-bottom: -0.2rem;
+}
+
+section#updateAvailable .flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+section#updateAvailable button {
+    font-size: 1rem;
+    border-radius: 1rem;
+}

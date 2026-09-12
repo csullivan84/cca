@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <title>About</title>
+    <link rel="stylesheet" href="css/global.css" />
+    <link rel="stylesheet" href="css/about.css" />
+  </head>
+  <body>
+    <main>
+      <h1 id="header-main">Colour Contrast Analyser (CCA)</h1>
+      <div class="center">
+        <p><span id="i18n-version">Version</span> <span id="cca-version"></span></p>
+        <img src="icons/cca.svg" width="100" height="100" alt="" />
+        <p><span id="i18n-developed">Developed by</span> <a href="https://www.tpgi.com" class="external-link">TPGi</a><br/><span id="i18n-under">Under</span> <a href="https://raw.githubusercontent.com/ThePacielloGroup/CCAe/main/LICENSE" class="external-link">GNU GPL v3.0</a></p>
+        <p id="i18n-nidrr">The funding for the original WCAG version of the Colour Contrast tool was provided by the Trace Center under grant #H133E030012 from the National Institute on Disability and Rehabilitation Research (NIDRR). However, no endorsement of the work by the NIDRR should be inferred.</p>
+      </div>
+      <h2 id="header-translations">Translations</h2>
+      <ul>
+        <li>Deutsch: <a href="https://github.com/OLLI-S" class="external-link">Oliver Sahr</a></li>
+        <li>Dutch: <a href="https://github.com/roelvangils" class="external-link">Roel Van Gils</a></li>
+        <li>Español: Marielisa Figuera and Pablo Rosas</li>
+        <li>Français: <a href="https://github.com/ferllings" class="external-link">@ferllings</a></li>
+        <li>Italiano: <a href="https://github.com/rscano" class="external-link">Roberto Scano</a></li>
+        <li>Magyar: <a href="https://github.com/szantaikaroly" class="external-link">Károly Szántai</a></li>
+        <li>Polski: Patryk Korzeniecki</li>
+        <li>Português (Brasil): <a href="https://www.igormarques.ca/" class="external-link">Igor Coelho A. S. Marques</a></li>
+        <li>Русский: <a href="https://github.com/AHOHNMYC" class="external-link">AHOHNMYC</a></li>
+        <li>日本語: <a href="https://github.com/motchie" class="external-link">Toru Motchie MOCHIDA</a></li>
+        <li>
+          한국어: <a href="https://github.com/miname" class="external-link">HungJae Lee</a> <a href="https://github.com/ungjinpark" class="external-link">Ungjin Park</a>
+        </li>
+      </ul>
+      <h2 id="header-exLinks">External links</h2>
+      <ul id="list-exLinks">
+        <li><a href="https://www.tpgi.com/color-contrast-checker/" class="external-link">TPGi Resources</a></li>
+        <li><a href="https://github.com/ThePacielloGroup/CCAe" class="external-link">Github page</a></li>
+        <li><a href="https://github.com/ThePacielloGroup/CCAe/issues" class="external-link">Report an issue</a></li>
+      </ul>
+      <div class="buttons">
+        <button id="close">Close</button> <!-- add this id to i18n so it can be translated -->
+      </div>
+    </main>
+    <script>
+      // You can also require other files to run in this process
+      require('./js/about.js');
+    </script>
+  </body>
+</html>
