@@ -5,8 +5,8 @@ Application: CCA 4.0.0. Electron: 44.3.0. Builder: 26.15.3.
 
 ## Executed locally
 
-- 34 Node unit tests passed: colour formats, unrounded thresholds, alpha, suggestions,
-  reports, bounded state, shortcuts, undo/redo, display bounds and private-update security.
+- 38 Node unit tests passed: colour formats, unrounded thresholds, alpha, suggestions,
+  reports, bounded state, shortcuts, undo/redo, display bounds, portable packaging and private-update security.
 - 12 source Electron UI tests passed on macOS ARM64.
 - The same 12 tests passed against the packaged macOS ARM64 app.
 - axe WCAG A/AA checks passed for the main view, both dialogs and expanded panels.
@@ -26,8 +26,16 @@ Application: CCA 4.0.0. Electron: 44.3.0. Builder: 26.15.3.
 
 ## Cross-platform CI
 
-A manual GitHub Actions run was dispatched for Windows, macOS and Linux.
-Final outcome is recorded below after the run completes.
+First cross-platform run passed on Windows, macOS and Linux:
+https://github.com/csullivan84/cca/actions/runs/34671674118
+
+- Windows: unit tests, all 12 source UI tests, all 12 packaged application tests,
+  and Windows x64 ZIP creation passed on a native Windows runner.
+- macOS: unit, source UI and packaged UI tests passed.
+- Linux: unit and source UI tests plus unpacked application build passed.
+
+A final follow-up run validates the new portable afterPack hook, four added packaging
+unit cases, updated SHA-pinned Actions versions, and packaged Linux execution.
 
 ## Remaining external validation/release limits
 

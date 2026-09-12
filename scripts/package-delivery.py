@@ -20,7 +20,7 @@ if output.exists():
     # Preserve the original supplied upstream source archive once.
     original = root.parent / 'cca-original-source.zip'
     with zipfile.ZipFile(output) as old:
-        original_archive = any(n.startswith('CCAe-main/') for n in old.namelist())
+        original_archive = 'BUILD.json' not in old.namelist()
     if original_archive and not original.exists():
         output.rename(original)
 temporary = output.with_suffix('.zip.partial')
