@@ -34,8 +34,13 @@ https://github.com/csullivan84/cca/actions/runs/34671674118
 - macOS: unit, source UI and packaged UI tests passed.
 - Linux: unit and source UI tests plus unpacked application build passed.
 
-A final follow-up run validates the new portable afterPack hook, four added packaging
-unit cases, updated SHA-pinned Actions versions, and packaged Linux execution.
+Final follow-up run also passed all three platform jobs:
+https://github.com/csullivan84/cca/actions/runs/34671969178
+
+This run includes 38 unit tests and 12 source plus 12 packaged UI tests on each
+of Windows, macOS and Linux, the portable afterPack hook, and SHA-pinned current
+Actions versions. Native Windows ZIP creation passed again. The final documentation
+commits do not change the tested application code.
 
 ## Remaining external validation/release limits
 

@@ -34,6 +34,8 @@ with zipfile.ZipFile(temporary, 'w', compression=zipfile.ZIP_DEFLATED, compressl
             archive.write(file, 'source/' + name)
     for name in ['README.md', 'LICENSE', 'THIRD_PARTY_NOTICES.md', 'IMPROVEMENTS.md']:
         archive.write(root / name, name)
+    for file in sorted((root / 'docs').glob('*.md')):
+        archive.write(file, 'docs/' + file.name)
     for name in ['unit-tests.txt', 'ui-tests.txt', 'packaged-mac-tests.txt', 'dependency-audit.jsonl']:
         file = root / 'artifacts' / name
         if file.is_file():

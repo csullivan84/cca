@@ -5,7 +5,8 @@ macOS and Linux. Electron 44.3.0; application version 4.0.0.
 
 ## Windows: no developer tools required
 
-Download/extract the entire `cca.zip`, then run `Start CCA.cmd` or
+The private [Windows download](https://github.com/csullivan84/cca/releases/tag/v4.0.0)
+contains `cca.zip`. Extract the entire archive, then run `Start CCA.cmd` or
 `windows/CCA.exe`. Do not run the EXE from inside the ZIP or move it away from
 its DLLs and resources. Node.js, Git, GitHub login and administrator installation
 are not required. The included Windows build is x64 and unsigned.
@@ -68,7 +69,8 @@ Private development repository: https://github.com/csullivan84/cca
 ## Build and test
 
 Node.js 22+ and a desktop session are needed for source builds/UI tests, not for
-running the bundled Windows application.
+running the bundled Windows application. Run the commands below from the repository
+root (`source/` inside the delivery ZIP).
 
 ```sh
 npx --yes yarn@1.22.22 install --frozen-lockfile --non-interactive

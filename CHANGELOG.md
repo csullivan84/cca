@@ -1,3 +1,16 @@
+# Independent CCA 4.0.0 — 2026-09-11
+
+- Electron 44.3.0 and modernized, audited build dependencies.
+- Accessible offline workbench, sandboxed renderer and validated IPC.
+- Exact WCAG 2.2 contrast, modern CSS colour input and alpha compositing.
+- History, favourites, undo/redo, suggestions, palettes, reports and screenshot sampling.
+- Portable Windows x64 runtime and per-user installer configuration.
+- Cross-platform source/packaged UI tests and automated accessibility checks.
+- Independent private repository; original TPGi attribution and GPL retained.
+- Builds are unsigned. Private signed-update client is opt-in, not a deployed service.
+
+## Original upstream changelog (preserved below)
+
 # Changelog
 
 **Known issues**
