@@ -1,3 +1,5 @@
+> **Experimental — pre-alpha.** This independent project is under active development and is not a production-ready release. Expect bugs and breaking changes; validate results independently before relying on them for accessibility decisions.
+
 # CCA — independent Colour Contrast Analyser
 
 An offline-first, keyboard-accessible colour contrast workbench for Windows,
